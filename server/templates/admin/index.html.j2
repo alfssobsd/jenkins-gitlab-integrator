@@ -1,0 +1,16 @@
+{% extends "admin/base-admin.html.j2" %}
+
+{% block title %}
+  <title>JIS::Admin::Control</title>
+{% endblock %}
+
+{% block payload %}
+<h2>Version {{ version }} </h2>
+<h2>Config</h2>
+<figure class="highlight">
+  <pre>
+{{ config }}
+  </pre>
+</figure>
+
+{% endblock %}

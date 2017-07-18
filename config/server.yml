@@ -1,0 +1,60 @@
+host: 0.0.0.0 # listen address
+port: 8000 # listen port
+log_level: INFO # log level
+session_secret: W4GVt6aQql1iT2YC5f8z98jsB2xwm9KroHsrQSiFrgI= # salt for cookies
+#user list
+users:
+  - username: root
+    password: root
+    token: adEleRYsiViB
+    superuser: yes # Disable restrictions for this user
+
+  - username: gitlab_bot
+    password: gitlab_bot
+    token: adEleRYsiViB1_34 #token for api auth , gitlab Private-Token header !!! All token must be unique
+    permission: [GITLAB_HOOKS] # allow access to GITLAB_HOOKS
+
+  - username: admin
+    password: password
+    permission: [ADMIN_UI] # allow access to admin ui
+
+#mysql connection, same as alembic.ini
+mysql:
+  db: jenkins_integrator
+  host: 127.0.0.1
+  user: root
+  password: test
+  port: 3306
+  minsize: 5
+  maxsize: 5
+
+#gitlab api config
+gitlab:
+  url: https://gitlab.example.local #gitlab url
+  access_token: adEleRYsiViB #gitlab user api token (look to gitlab docs)
+
+#background workers config
+workers:
+  enable: yes #enable or disable run workers
+  max_attempts: 1400 # how many try for do task
+  scan_timeout: 60 # period between task run
+
+jenkins: #settings for jenkins
+  user_id: sergei.kravchuk #jenkins user
+  api_token: 2342b01c03caaa0465d144e310893ba9 # jenkins api token
+  groups: # groups jobs
+    testproject: # name of group
+      jobs_base_path: https://jenkins.example.local/job/experments #base job path for group
+      first_job: testproject #first job for run
+      chains: #chains of jobs
+        default: #chain name
+          - testproject #job in chain
+          - testprojectendstep
+    test2:
+      jobs_base_path: https://jenkins.example.local/job/test2
+      first_job: test
+      chains:
+        default:
+          - test
+          - test2
+

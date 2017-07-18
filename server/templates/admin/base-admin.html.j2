@@ -1,0 +1,46 @@
+{% extends "base.html.j2" %}
+
+{% block stylesheet %}
+  <link rel="stylesheet" type="text/css" href="{{ url('static', filename='css/bootstrap.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url('static', filename='css/admin.css') }}" />
+{% endblock %}
+
+{% block content %}
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">jenkins-gitlab-integrator</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      {# left menu #}
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li><a href="/admin">Config</a></li>
+          <li><a href="/admin/delayed_tasks/list_new">DelayedTasks</a></li>
+          <li><a href="/admin/delayed_tasks/list_new">DelayedTasks/search</a></li>
+        </ul>
+      </div>
+      {# main content #}
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        {% block payload %}
+        <h1 class="page-header">Dashboard</h1>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "admin/base-admin.html.j2" %}
+
+{% block title %}
+  <title>JIS::Admin::Control::DelayedTask::List</title>
+{% endblock %}
+
+{% block payload %}
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="{{ 'active' if task_status == 'NEW' }}">
+      <a href="/admin/delayed_tasks/list_new">NEW</a>
+    </li>
+    <li role="presentation" class="{{ 'active' if task_status == 'CANCELED' }}">
+      <a href="/admin/delayed_tasks/list_canceled">CANCELED</a>
+    </li>
+    <li role="presentation" class="{{ 'active' if task_status == 'SUCCESS' }}">
+      <a href="/admin/delayed_tasks/list_success">SUCCESS</a>
+    </li>
+  </ul>
+  <h1>{{ task_status }} (limit = 150)</h1>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>task_status</th>
+        <th>task_type</th>
+        <th>group</th>
+        <th>job_name</th>
+        <th>branch</th>
+        <th>sha1</th>
+        <th>counter_attempts</th>
+        <th>gitlab_merge_comment_id</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in tasks %}
+        <tr>
+          <th>{{ item.id }}</th>
+          <td>{{ item.task_status }}</td>
+          <td>{{ item.task_type }}</td>
+          <td>{{ item.group }}</td>
+          <td>{{ item.job_name }}</td>
+          <td>{{ item.branch }}</td>
+          <td>{{ item.sha1 }}</td>
+          <td>{{ item.counter_attempts }}</td>
+          <td>{{ item.gitlab_merge_comment_id }}</td>
+          <td>
+              <form action="/admin/delayed_tasks/change_status/{{ item.uniq_md5sum }}" method="post">
+                <button name="task_status" class="btn btn-primary" value="new">change to NEW</button>
+              </form>
+              <form action="/admin/delayed_tasks/change_status/{{ item.uniq_md5sum }}" method="post">
+                <button name="task_status" class="btn btn-danger" value="canceled">change to CANCELED</button>
+              </form>
+              <form action="/admin/delayed_tasks/change_status/{{ item.uniq_md5sum }}" method="post">
+                <button name="task_status" class="btn btn-success" value="success">change to SUCCESS</button>
+              </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
