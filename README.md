@@ -2,11 +2,11 @@
 
 Server for integration GitLab CE with Jenkins (in last version GitLab (9.x) integration with jenkins enable only in EE version).
 
-Server work only with multibranch pipline jobs (maybe i will implement non-multibranch pipeline)
+Server works only with multibranch pipeline jobs (maybe i will implement non-multibranch pipeline)
 
 How it work:
-* all push start build in jenkins (if the branch does not already exist, then the server will try to start the job until it reaches the limit of attempts or build starts.)
-* for each merge request server check the build and write comment about status
+* every  push starts build in jenkins (if the branch does not already exist, then the server will try to start the job until it reaches the limit of attempts or build starts.)
+* for each merge request server checks the build and write comment about status
 
 Menu:
 
@@ -20,7 +20,7 @@ Menu:
   * [Admin UI](#using_admin_ui)
   * [App stats](#using_stats)
 * [Development](#development)
-  * [Prepared dev machine](#development_prepare_dev)
+  * [Prepare dev machine](#development_prepare_dev)
   * [Prepare DB](#development_db)
   * [Libs](#development_libs)
   * [GitLab webhook processing](#development_gitlab_webhook)
@@ -111,7 +111,7 @@ jenkins: #settings for jenkins
 
 ### <a name="using_example_group"></a> Example group config
 
-![simple build (pipline multibranch)](docs/images/jenkins-integrator-config-simple.png)
+![simple build (pipeline multibranch)](docs/images/jenkins-integrator-config-simple.png)
 ```
   groups:
     test:
@@ -131,7 +131,7 @@ gitlab webhook `http://server:port/gitlab/group/test/job/t1` or
 `http://server:port/gitlab/group/test/job/t3`
 
 
-![star build (pipline multibranch)](docs/images/jenkins-integrator-config-star.png)
+![star build (pipeline multibranch)](docs/images/jenkins-integrator-config-star.png)
 ```
   groups:
     appd:
