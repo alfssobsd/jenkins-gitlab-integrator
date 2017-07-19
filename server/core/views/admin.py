@@ -19,37 +19,34 @@ class AdminIndexView(web.View, LoggingMixin):
         return { 'config': pprint.pformat(self.request.app['config'], indent=2, width=256),
                  'version' : self.request.app['version']}
 
-class AdminDelayedTasksListView(web.View, LoggingMixin):
+class AdminDelayedTasksEditView(web.View, LoggingMixin):
     """
         Show DelayedTask by status
     """
     @set_log_marker
     @create_delayed_manager
-    @aiohttp_jinja2.template('admin/delayed_task/list.html.j2')
+    @aiohttp_jinja2.template('admin/delayed_task/edit.html.j2')
     @require_permission(Permission.ADMIN_UI)
     async def get(self):
-        try:
-            task_status = self.request.match_info['task_status']
-            tasks = await self.delayed_task_manager.get_by_status(DelayedTaskStatus[task_status.upper()], 150)
-            return {'tasks': tasks, 'task_status': task_status.upper() }
-        except KeyError:
-            tasks = await self.delayed_task_manager.get_by_status(DelayedTaskStatus.NEW, 150)
-            return {'tasks': tasks, 'task_status': DelayedTaskStatus.NEW.name.upper() }
+        task_id = self.request.match_info['id']
+        delayed_task = await self.delayed_task_manager.get(task_id)
+        return { 'task': delayed_task }
 
 class AdminDelayedTasksChangeStatusView(web.View, LoggingMixin):
     """
-        Change task status and redirect to new view
+        Change DelayedTask status
     """
     @set_log_marker
     @create_delayed_manager
     @require_permission(Permission.ADMIN_UI)
     async def post(self):
-        uniq_md5sum = self.request.match_info['uniq_md5sum']
+        task_id = self.request.match_info['id']
         data = await self.request.post()
         task_status = data['task_status']
-        admin_delayed_task_list_url = self.request.app.router['admin_delayed_task_list'].url(parts={'task_status':task_status})
 
-        delayed_tasks = await self.delayed_task_manager.get_by_uniq_md5sum(uniq_md5sum)
+        admin_delayed_task_list_url = self.request.app.router['admin_delayed_task_edit'].url(parts={'id': task_id })
+
+        delayed_tasks = await self.delayed_task_manager.get(task_id)
         await self.delayed_task_manager.clear_attempts(delayed_tasks.id)
         await self.delayed_task_manager.set_status(delayed_tasks.id, DelayedTaskStatus[task_status.upper()])
 
@@ -57,10 +54,29 @@ class AdminDelayedTasksChangeStatusView(web.View, LoggingMixin):
 
 class AdminDelayedTasksSearchView(web.View, LoggingMixin):
     """
-        Search delayedtask by task_type, group, job_name, branch, sha1
+        Search DelayedTask by task_type, group, job_name, branch, sha1
     """
     @set_log_marker
+    @create_delayed_manager
+    @aiohttp_jinja2.template('admin/delayed_task/search.html.j2')
     @require_permission(Permission.ADMIN_UI)
-    async def post(self):
-        tasks = []
-        return {'tasks': tasks }
+    async def get(self):
+        form_data = self._parse_form_data(self.request.query)
+        tasks = await self.delayed_task_manager.search(**form_data)
+        return {'form_data': form_data, 'tasks': tasks }
+
+
+    def _parse_form_data(self, query):
+        form_data = {
+            'task_type' : 'GITLAB_MERGE_REQ',
+            'group' : None,
+            'job_name' : None,
+            'branch' : None,
+            'sha1' : None,
+        }
+
+        for key in query.keys():
+            if key in form_data:
+                form_data[key] = query[key]
+
+        return form_data

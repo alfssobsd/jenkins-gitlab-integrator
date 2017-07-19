@@ -1,0 +1,34 @@
+{% extends "admin/base-admin.html.j2" %}
+
+{% block title %}
+  <title>JIS::Admin::Control::DelayedTask::Edit::{{ task.id }}</title>
+{% endblock %}
+
+{% block payload %}
+<h2>Edit task id {{ task.id }}</h2>
+<div class="row">
+  <div class="col-sm-6">
+    <dl class="dl-horizontal">
+      {% for key in task.values %}
+        <dt>{{ key }}</dt>
+        {% if key == 'task_status' %}
+          <dd><b>{{ task.values[key] }}</b></dd>
+        {% else %}
+          <dd>{{ task.values[key] }}</dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+  </div>
+  <div class="col-sm-6">
+    <form action="/admin/delayed_tasks/{{ task.id }}/change_status" method="post">
+      <button name="task_status" class="btn btn-primary" value="new">change to NEW</button>
+    </form>
+    <form action="/admin/delayed_tasks/{{ task.id }}/change_status" method="post">
+      <button name="task_status" class="btn btn-danger" value="canceled">change to CANCELED</button>
+    </form>
+    <form action="/admin/delayed_tasks/{{ task.id }}/change_status" method="post">
+      <button name="task_status" class="btn btn-success" value="success">change to SUCCESS</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

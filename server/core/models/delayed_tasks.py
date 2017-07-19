@@ -113,6 +113,62 @@ class DelayedTaskManager(LoggingMixin):
         self.db_pool = db_pool
         self._delayed_tasks = tables['delayed_tasks']
 
+
+    async def search(self, task_type = None, task_status = None, group = None,
+            job_name = None, branch = None, sha1 = None, limit=150):
+        """
+            Search delayed_tasks by fields
+
+            Args:
+                task_type - task type
+                task_status - task status
+                group  - group name
+                job_name - job_name
+                branch - branch
+                sha1  - sha1
+        Return:
+            list[DelayedTask obj, DelayedTask obj]
+
+        Exceptions:
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        self._logging_debug("Search: %s %s %s %s %s %s" % (task_type,
+                            task_status, group, job_name, branch, sha1))
+
+        colums = self._delayed_tasks.c
+        async with self.db_pool.acquire() as conn:
+            q = self._delayed_tasks.select()
+
+            if task_type:
+                q = q.where(colums.task_type == task_type)
+
+            if task_status:
+                q = q.where(colums.task_status == task_status)
+
+            if group:
+                q = q.where(colums.group == group)
+
+            if job_name:
+                q = q.where(colums.job_name == job_name)
+
+            if branch:
+                q = q.where(colums.branch == branch)
+
+            if sha1:
+                q = q.where(colums.sha1 == sha1)
+
+            if limit:
+                q = q.limit(limit)
+
+            q = q.order_by(desc(colums.id))
+
+            self._logging_debug(q)
+            result = await conn.execute(q)
+            rows = await result.fetchall()
+            list_data_obj = await self._mapping_from_tuple(rows)
+            return list_data_obj
+
     async def get_or_create(self, delayed_task):
         """
         Create or get exist DelayedTask object
@@ -171,6 +227,33 @@ class DelayedTaskManager(LoggingMixin):
             self._logging_debug(obj)
             return obj
 
+    async def get(self, task_id):
+        """
+        Get one DelayedTask object by id field
+
+        Args:
+            id - value id field
+
+        Return:
+            DelayedTask object
+
+        Exceptions:
+                RecordNotFound
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            q = self._delayed_tasks.select().where(self._delayed_tasks.c.id == task_id)
+            self._logging_debug(q)
+            result = await conn.execute(q)
+            row = await result.fetchone()
+            if row is None:
+                msg = "DelayedTask with id: {} does not exists"
+                raise RecordNotFound(msg.format(task_id))
+            obj = await self._mapping_row_to_delayed_task(row)
+            self._logging_debug(obj)
+            return obj
+
     async def get_by_status(self, task_status, limit = 150):
         """
         Get list DelayedTask by task_status
@@ -186,15 +269,7 @@ class DelayedTaskManager(LoggingMixin):
                 and anower from sqlalchemy
         """
         self._logging_debug("Get delayed_task with status: %s" % task_status.name)
-        async with self.db_pool.acquire() as conn:
-            q = self._delayed_tasks.select().where(self._delayed_tasks.c.task_status == task_status.name).\
-                order_by(desc(self._delayed_tasks.c.id))
-            if limit:
-                q = q.limit(limit)
-            result = await conn.execute(q)
-            rows = await result.fetchall()
-            list_data_obj = await self._mapping_from_tuple(rows)
-            return list_data_obj
+        return (await self.search(task_status = task_status.name))
 
     async def get_by_status_new(self, limit = 150):
         """

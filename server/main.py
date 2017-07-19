@@ -21,7 +21,8 @@ from server.utils import TRAFARET
 from .core.views.debug import DebugView
 from .core.views.gitlab import GitLabWebhookView
 from .core.views.common import LoginView, LogOutView, IndexView, StatsView
-from .core.views.admin import AdminIndexView, AdminDelayedTasksListView, AdminDelayedTasksChangeStatusView
+from .core.views.admin import AdminIndexView, AdminDelayedTasksChangeStatusView, \
+            AdminDelayedTasksSearchView, AdminDelayedTasksEditView
 from .core.workers.gitlab_worker import GitLabWorker
 from .core.security.policy import FileAuthorizationPolicy
 
@@ -48,8 +49,11 @@ class RoutesMixin(object):
         self.app.router.add_post('/login', LoginView, name='login_post')
         self.app.router.add_get('/logout', LogOutView, name='logout')
         self.app.router.add_get('/admin', AdminIndexView, name='admin_index')
-        self.app.router.add_get('/admin/delayed_tasks/list_{task_status}', AdminDelayedTasksListView, name='admin_delayed_task_list')
-        self.app.router.add_post('/admin/delayed_tasks/change_status/{uniq_md5sum}',
+        self.app.router.add_get('/admin/delayed_tasks/search',
+                                AdminDelayedTasksSearchView, name='admin_delayed_task_search')
+        self.app.router.add_get('/admin/delayed_tasks/{id}/edit',
+                                AdminDelayedTasksEditView, name='admin_delayed_task_edit')
+        self.app.router.add_post('/admin/delayed_tasks/{id}/change_status',
                                     AdminDelayedTasksChangeStatusView, name='admin_delayed_task_change_status')
         self.app.router.add_post('/debug/post/webhook', DebugView)
         self.app.router.add_get('/debug/get/webhook', DebugView)
