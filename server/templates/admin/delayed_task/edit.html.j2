@@ -8,16 +8,20 @@
 <h2>Edit task id {{ task.id }}</h2>
 <div class="row">
   <div class="col-sm-6">
-    <dl class="dl-horizontal">
-      {% for key in task.values %}
-        <dt>{{ key }}</dt>
-        {% if key == 'task_status' %}
-          <dd><b>{{ task.values[key] }}</b></dd>
-        {% else %}
-          <dd>{{ task.values[key] }}</dd>
-        {% endif %}
-      {% endfor %}
-    </dl>
+    <table class="table table-striped">
+      <tbody>
+        {% for key in task.values.keys() | sort %}
+          <tr>
+            <td>{{ key }}</td>
+          {% if key == 'task_status' %}
+            <td><b>{{ task.values[key] }}</b></td>
+          {% else %}
+            <td>{{ task.values[key] }}</td>
+          {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
   <div class="col-sm-6">
     <form action="/admin/delayed_tasks/{{ task.id }}/change_status" method="post">
