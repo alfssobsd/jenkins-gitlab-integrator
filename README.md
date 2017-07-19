@@ -234,7 +234,7 @@ make test
 
 ![push processing](docs/images/jenkins-integrator-gitlab-webhook-push.jpg)
 
-#### Mege Processing
+#### Mege processing
 
 ![merge processing](docs/images/jenkins-integrator-gitlab-webhook-merge.jpg)
 
