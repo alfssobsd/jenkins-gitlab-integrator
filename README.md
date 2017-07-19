@@ -10,15 +10,15 @@ How it work:
 
 Menu:
 
-* [Using](#using)
-  * [Install requirements libs](#using_install_libs)
-  * [Configure database schema](#using_config_db)
-  * [Configure server](#using_config_server)
-  * [Example group config](#using_example_group)
-  * [Example Gitlab webhook](#using_gitlab_webhook)
-  * [Exec server](#using_exec_server)
-  * [Admin UI](#using_admin_ui)
-  * [App stats](#using_stats)
+* [Usage](#usage)
+  * [Install requirements libs](#usage_install_libs)
+  * [Configure database schema](#usage_config_db)
+  * [Configure server](#usage_config_server)
+  * [Example group config](#usage_example_group)
+  * [Example Gitlab webhook](#usage_gitlab_webhook)
+  * [Exec server](#usage_exec_server)
+  * [Admin UI](#usage_admin_ui)
+  * [App stats](#usage_stats)
 * [Development](#development)
   * [Prepare dev machine](#development_prepare_dev)
   * [Prepare DB](#development_db)
@@ -26,14 +26,14 @@ Menu:
   * [GitLab webhook processing](#development_gitlab_webhook)
 
 
-## <a name="using"></a> Using
+## <a name="usage"></a> Usage
 
-### <a name="using_install_libs"></a> Install requirements libs
+### <a name="usage_install_libs"></a> Install requirements libs
 ```
 pip install -r requirements.txt
 ```
 
-### <a name="using_config_db"></a> Configure database schema
+### <a name="usage_config_db"></a> Configure database schema
 
 Edit alembic.ini , set sqlalchemy.url for connect database
 
@@ -44,7 +44,7 @@ vim alembic.ini
 alembic upgrade head
 ```
 
-### <a name="using_config_server"></a> Configure server
+### <a name="usage_config_server"></a> Configure server
 
 config:
 ```
@@ -109,7 +109,7 @@ jenkins: #settings for jenkins
           - test2
 ```
 
-### <a name="using_example_group"></a> Example group config
+### <a name="usage_example_group"></a> Example group config
 
 ![simple build (pipeline multibranch)](docs/images/jenkins-integrator-config-simple.png)
 ```
@@ -157,17 +157,17 @@ gitlab webhook `http://server:port/gitlab/group/test/job/t1` or
 
 gitlab webhook `http://server:port/gitlab/group/appd/job/{job_name}`
 
-### <a name="using_gitlab_webhook"></a> Example Gitlab webhook
+### <a name="usage_gitlab_webhook"></a> Example Gitlab webhook
 
 ![docs/images/gitlab-webhook-settings.png](docs/images/gitlab-webhook-settings.png)
 
 
-### <a name="using_exec_server"></a> Exec server
+### <a name="usage_exec_server"></a> Exec server
 ```
 python -m server.main -c /path/to/config/server.yml
 ```
 
-### <a name="using_admin_ui"></a> Admin UI
+### <a name="usage_admin_ui"></a> Admin UI
 
 Admin UI provide:
  * management for delayed tasks
@@ -177,7 +177,7 @@ Admin UI provide:
 Go to http://server:port/login
 ```
 
-### <a name="using_stats"></a> App stats
+### <a name="usage_stats"></a> App stats
 
 `http://server:port/stats` return json with stats.
 
