@@ -1,0 +1,16 @@
+sudo: required
+
+language: python
+
+services:
+  - docker
+
+script:
+  - make test
+  - make build_docker_release
+
+deploy:
+  - provider: script
+    script: docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"; make push_docker_release
+    on:
+      branch: master
