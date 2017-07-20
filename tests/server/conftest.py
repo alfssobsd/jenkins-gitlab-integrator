@@ -60,7 +60,7 @@ def fixture_workers_config():
 
 @pytest.fixture(scope="module")
 def fixture_db_tables():
-    engine = sa.create_engine('mysql+pymysql://root:test@127.0.0.1:3307/test')
+    engine = sa.create_engine('mysql+pymysql://root:test@127.0.0.1/test_jenkins_integrator')
     conn = engine.connect()
     meta = sa.MetaData(conn)
     meta.reflect()
