@@ -3,7 +3,7 @@ services:
   mysql:
     image: mariadb:latest
     ports:
-      - "127.0.0.1:3306:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test
@@ -15,3 +15,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test
+
+  server:
+    image: alfss/jenkins-gitlab-integrator:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./dev_config:/opt/app/config

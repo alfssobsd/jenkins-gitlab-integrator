@@ -6,3 +6,8 @@ __pycache__
 *.pyc
 __pycache__/
 *.py[cod]
+docker-compose.yml
+README.md
+Dockerfile
+.editorconfig
+dev_config

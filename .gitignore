@@ -21,3 +21,4 @@ dist
 *.pyo
 *.tmp*
 __pycache__
+dev_config

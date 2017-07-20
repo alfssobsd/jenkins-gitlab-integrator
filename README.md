@@ -163,9 +163,24 @@ gitlab webhook `http://server:port/gitlab/group/appd/job/{job_name}`
 
 
 ### <a name="usage_exec_server"></a> Exec server
+
+Copy config to anower dirs and modify
 ```
-python -m server.main -c /path/to/config/server.yml
+cp config/alembic.yml /opt/jenkins-gitlab-integrator/config/
+cp config/server.yml /opt/jenkins-gitlab-integrator/config/
 ```
+
+Run migrations
+```
+docker run --rm -v /opt/jenkins-gitlab-integrator/config:/opt/app/config -it alfss/jenkins-gitlab-integrator:latest migrate
+``
+
+Start server
+```
+docker run -d -v /opt/jenkins-gitlab-integrator/config:/opt/app/config alfss/jenkins-gitlab-integrator:latest
+```
+
+Or you can make docker image with your config in /opt/app/config
 
 ### <a name="usage_admin_ui"></a> Admin UI
 
@@ -208,7 +223,12 @@ pip install -r requirements.txt
 create database jenkins_integrator DEFAULT CHARACTER SET utf8;
 
 vim alembic.ini
-alembic upgrade head
+alembic -c config/alembic.ini upgrade head
+```
+
+### Run server
+```
+python -m server.main -c /path/to/config/server.yml
 ```
 
 ### Run test
