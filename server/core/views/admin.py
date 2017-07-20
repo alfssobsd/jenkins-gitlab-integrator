@@ -16,8 +16,7 @@ class AdminIndexView(web.View, LoggingMixin):
     @aiohttp_jinja2.template('admin/index.html.j2')
     @require_permission(Permission.ADMIN_UI)
     async def get(self):
-        return { 'config': pprint.pformat(self.request.app['config'], indent=2, width=256),
-                 'version' : self.request.app['version']}
+        return { 'config': pprint.pformat(self.request.app['config'], indent=2, width=256)}
 
 class AdminDelayedTasksEditView(web.View, LoggingMixin):
     """

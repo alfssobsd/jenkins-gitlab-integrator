@@ -8,4 +8,6 @@ COPY . /opt/app
 
 RUN pip install -r requirements.txt
 
-CMD alembic upgrade head; python -m server.main -c /opt/app/config/server.yml
+ENTRYPOINT ["/opt/app/docker-entrypoint.sh"]
+
+CMD ["server"]

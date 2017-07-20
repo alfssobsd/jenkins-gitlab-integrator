@@ -1,3 +1,5 @@
+VERSION := $(shell cat server/main.py | grep -i "SERVER_VERSION =" | cut -d'=' -f2 | tr -d '" \n')
+
 dev_prepare:
 	pip install -r requirements.txt
 	docker-compose -p test -f docker-compose.yml up -d mysql
@@ -5,7 +7,12 @@ dev_prepare:
 build_docker:
 	find . -name __pycache__ -execdir rm -r {} +
 	find . -name '*.pyc' -delete
-	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:1.0.0 .
+	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:latest .
+
+build_docker_release:
+	find . -name __pycache__ -execdir rm -r {} +
+	find . -name '*.pyc' -delete
+	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:${VERSION} .
 
 test:
 	docker-compose -p test -f docker-compose.yml rm -fs mysql_test

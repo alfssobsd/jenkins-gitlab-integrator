@@ -35,8 +35,15 @@ class SecurityMixnin(object):
 class JinjaMixin(object):
     TEMPLATES_ROOT = pathlib.Path(__file__).parent / 'templates'
 
+    async def jinja_version_processor(self, request):
+        return {'app_version': request.app['app_version'] }
+
     def setup_jinja(self):
-        aiohttp_jinja2.setup(self.app, loader=jinja2.FileSystemLoader(str(self.TEMPLATES_ROOT)))
+
+        aiohttp_jinja2.setup(self.app,
+                            context_processors=[self.jinja_version_processor,
+                                                aiohttp_jinja2.request_processor],
+                            loader=jinja2.FileSystemLoader(str(self.TEMPLATES_ROOT)))
 
 class RoutesMixin(object):
 
@@ -145,7 +152,7 @@ class Server(JinjaMixin, RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBCo
         self.setup_security()
         self.setup_routes()
         self.init_sa_tables()
-        self.app['version'] = self.SERVER_VERSION
+        self.app['app_version'] = self.SERVER_VERSION
 
         self.app.middlewares.append(middlewares.uuid_marker_request)
         self.app.on_startup.append(self.init_connect_db)

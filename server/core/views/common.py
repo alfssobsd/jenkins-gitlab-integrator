@@ -64,5 +64,6 @@ class StatsView(web.View, LoggingMixin):
         all_running_tasks = asyncio.Task.all_tasks()
         tasks = await self.delayed_task_manager.get_by_status(DelayedTaskStatus.NEW, 150)
         stats = { 'coroutines_run' : len(all_running_tasks),
-                  'task_in_queue': len(tasks) }
+                  'task_in_queue': len(tasks),
+                  'app_version': self.request.app['app_version'] }
         return web.json_response(stats)

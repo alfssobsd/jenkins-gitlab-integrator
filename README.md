@@ -184,7 +184,8 @@ Go to http://server:port/login
 ```
 {
     "coroutines_run": 2, # current execute coroutines
-    "task_in_queue": 0 # count task with status new
+    "task_in_queue": 0, # count task with status new
+    "app_version": "1.0.0"
 }
 ```
 
