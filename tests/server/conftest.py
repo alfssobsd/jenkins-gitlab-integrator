@@ -60,7 +60,7 @@ def fixture_workers_config():
 
 @pytest.fixture(scope="module")
 def fixture_db_tables():
-    engine = sa.create_engine('mysql+pymysql://root:test@127.0.0.1/test_jenkins_integrator')
+    engine = sa.create_engine('mysql+pymysql://root@127.0.0.1/test_jenkins_integrator')
     conn = engine.connect()
     meta = sa.MetaData(conn)
     meta.reflect()
@@ -70,11 +70,10 @@ def fixture_db_tables():
 @pytest.yield_fixture()
 async def fixture_db_pool(request, loop):
     mysql_config = {
-        'db': 'test',
+        'db': 'test_jenkins_integrator',
         'host': '127.0.0.1',
         'user': 'root',
-        'password': 'test',
-        'port': 3307,
+        'port': 3306,
         'minsize': 2,
         'maxsize': 2,
     }
