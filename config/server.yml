@@ -23,7 +23,7 @@ mysql:
   db: jenkins_integrator
   host: 127.0.0.1
   user: root
-  password: test
+  password: ''
   port: 3306
   minsize: 5
   maxsize: 5

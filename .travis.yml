@@ -1,0 +1,23 @@
+sudo: required
+
+language: python
+python:
+  - "3.5"
+
+services:
+  - docker
+  - mysql
+
+before_install:
+  - mysql -e 'create database test_jenkins_integrator DEFAULT CHARACTER SET utf8;'
+
+script:
+  - alembic -n alembic_test -c config/alembic.ini upgrade head
+  - PYTHONPATH=. py.test -v
+  - make build_docker_release
+
+deploy:
+  - provider: script
+    script: docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"; make push_docker_release
+    on:
+      branch: master
