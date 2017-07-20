@@ -9,7 +9,7 @@ services:
   - mysql
 
 before_install:
-  - mysql -e 'drop database test_jenkins_integrator;'
+  - mysql -e 'create database test_jenkins_integrator DEFAULT CHARACTER SET utf8;'
 
 script:
   - alembic -n alembic_test -c config/alembic.ini upgrade head
