@@ -12,13 +12,15 @@ dev_server:
 	docker-compose -p dev -f docker-compose.yml up -d server
 
 build_docker:
-	find . -name __pycache__ -execdir rm -rf {} + 2>/dev/null
-	find . -name '*.pyc' -delete 2>/dev/null
+	find . -path '*/__pycache__/*' -delete
+	find . -type d -name '__pycache__' -empty -delete
+	find . -name '*.pyc' -delete
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:latest .
 
 build_docker_release:
-	find . -name __pycache__ -execdir rm -rf {} + 2>/dev/null
-	find . -name '*.pyc' -delete 2>/dev/null
+	find . -path '*/__pycache__/*' -delete
+	find . -type d -name '__pycache__' -empty -delete
+	find . -name '*.pyc' -delete
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:latest .
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:${VERSION} .
 
