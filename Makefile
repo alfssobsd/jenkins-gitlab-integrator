@@ -19,6 +19,10 @@ build_docker_release:
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:latest .
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:${VERSION} .
 
+push_docker_release:
+	docker push alfss/jenkins-gitlab-integrator:latest
+	docker push alfss/jenkins-gitlab-integrator:${VERSION}
+
 test:
 	docker-compose -p test -f docker-compose.yml rm -fs mysql_test
 	docker-compose -p test -f docker-compose.yml up -d mysql_test
