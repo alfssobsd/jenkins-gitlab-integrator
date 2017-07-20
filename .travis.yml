@@ -6,9 +6,14 @@ python:
 
 services:
   - docker
+  - mysql
+
+before_install:
+  - mysql -e 'drop database test_jenkins_integrator;'
 
 script:
-  - make test
+  - alembic -n alembic_test -c config/alembic.ini upgrade head
+  - PYTHONPATH=. py.test -v
   - make build_docker_release
 
 deploy:
