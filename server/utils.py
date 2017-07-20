@@ -11,7 +11,7 @@ TRAFARET = T.Dict({
             'db': T.String(),
             'host': T.String(),
             'user': T.String(),
-            'password': T.String(),
+            'password': T.String(allow_blank=True),
             'port': T.Int(),
             'minsize': T.Int(),
             'maxsize': T.Int(),

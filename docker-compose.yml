@@ -5,16 +5,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: test
-      MYSQL_DATABASE: test
-
-  mysql_test:
-    image: mariadb:latest
-    ports:
-      - "127.0.0.1:3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: test
-      MYSQL_DATABASE: test
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   server:
     image: alfss/jenkins-gitlab-integrator:latest
