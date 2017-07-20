@@ -173,7 +173,7 @@ cp config/server.yml /opt/jenkins-gitlab-integrator/config/
 Run migrations
 ```
 docker run --rm -v /opt/jenkins-gitlab-integrator/config:/opt/app/config -it alfss/jenkins-gitlab-integrator:latest migrate
-``
+```
 
 Start server
 ```
