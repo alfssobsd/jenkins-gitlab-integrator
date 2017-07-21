@@ -142,7 +142,7 @@ class Server(JinjaMixin, RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBCo
     """
     Server entrypoint
     """
-    SERVER_VERSION = "1.0.1"
+    SERVER_VERSION = "1.0.2"
 
     def __init__(self, argv):
         self.app = web.Application(loop=asyncio.get_event_loop())
