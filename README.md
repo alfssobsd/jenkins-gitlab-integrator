@@ -51,7 +51,12 @@ config:
 host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
-session_secret: W4GVt6aQql1iT2YC5f8z98jsB2xwm9KroHsrQSiFrgI= # salt for cookies
+
+#before usage you need generate secret key
+#from cryptography.fernet import Fernet
+#Fernet.generate_key()
+session_secret: N5I6xGINvJ6RigIwd_SX7nHM4J7zYc6ONx6MGH3F__o=
+
 #user list
 users:
   - username: root
