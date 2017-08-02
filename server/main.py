@@ -21,9 +21,8 @@ from server.utils import TRAFARET
 from .core.views.debug import DebugView
 from .core.views.gitlab import GitLabWebhookView
 from .core.views.common import LoginView, LogOutView, IndexView, StatsView
-from .core.views.admin import AdminIndexView, \
-            AdminDelayedTasksSearchView, AdminDelayedTasksEditView
-from .core.views.admin_api import AdminApiV1ConfigView
+from .core.views.admin import AdminIndexView
+from .core.views.admin_api import AdminApiV1ConfigView, AdminApiV1DelayedTasksView
 from .core.workers.gitlab_worker import GitLabWorker
 from .core.security.policy import FileAuthorizationPolicy
 
@@ -58,6 +57,7 @@ class RoutesMixin(object):
         self.app.router.add_get('/logout', LogOutView, name='logout')
         self.app.router.add_get('/admin', AdminIndexView, name='admin_index')
         self.app.router.add_get('/admin/api/v1/config', AdminApiV1ConfigView, name='admin_api_v1_config')
+        self.app.router.add_get('/admin/api/v1/delayed-task', AdminApiV1DelayedTasksView, name='admin_api_v1_delayed_task')
         self.app.router.add_get('/admin/{path:.*}', AdminIndexView, name='admin_angular')
         # self.app.router.add_get('/admin/delayed_tasks/search',
         #                         AdminDelayedTasksSearchView, name='admin_delayed_task_search')

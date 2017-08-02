@@ -10,7 +10,8 @@ import { ConfigComponent } from './config/config.component';
 import { ConfigService } from './config/config.service';
 // gitlab webhooks
 // delayed task
-import { DelayedTasksComponent } from './delayed-tasks/delayed-tasks.component';
+import { DelayedTasksComponent } from './delayed-task/delayed-tasks.component';
+import { DelayedTaskService } from './delayed-task/delayed-task.service';
 
 // routing
 import { AppRoutingModule } from './app-routing.module';
@@ -28,7 +29,10 @@ import { AppRoutingModule } from './app-routing.module';
     HttpModule,
     AppRoutingModule
   ],
-  providers: [ ConfigService ],
+  providers: [
+    ConfigService,
+    DelayedTaskService
+  ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

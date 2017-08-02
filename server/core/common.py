@@ -1,5 +1,9 @@
+import json
 import logging
 import sys
+
+from server.core.models.delayed_tasks import DelayedTask
+
 
 class LoggingMixin(object):
     """
@@ -28,3 +32,9 @@ class LoggingMixin(object):
 
     def _fullname_caller(self):
         return self.__module__ + "." + self.__class__.__name__ + "." + sys._getframe(3).f_code.co_name
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, DelayedTask):
+            return o.values
+        return json.JSONEncoder.default(self, o)
