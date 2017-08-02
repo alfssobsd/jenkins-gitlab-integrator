@@ -23,3 +23,5 @@ dist
 __pycache__
 dev_config
 server/static/angular_app
+*.iml
+.idea/
