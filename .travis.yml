@@ -1,14 +1,20 @@
 sudo: required
 
+matrix:
+  fast_finish: true
+
 language: python
 python:
   - "3.5"
+node_js:
+  - "6"
 
 services:
   - docker
   - mysql
 
 before_install:
+  - npm install -g @angular/cli
   - mysql -e 'create database test_jenkins_integrator DEFAULT CHARACTER SET utf8;'
 
 script:
