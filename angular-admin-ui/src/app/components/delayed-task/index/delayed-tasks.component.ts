@@ -29,7 +29,6 @@ export class DelayedTasksComponent implements OnInit {
   }
 
   search() {
-    console.log(this.searchData)
     this.delayedTaskService
       .searchDelayedTasks(this.searchData)
       .then(tasks => this.delayedTasks = tasks)

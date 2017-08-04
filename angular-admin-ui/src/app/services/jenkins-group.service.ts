@@ -17,7 +17,7 @@ export class JenkinsGroupService {
     let params: URLSearchParams = new URLSearchParams();
     params.set("name", name);
 
-    return this.http.get(url)
+    return this.http.get(url, {search: params})
       .toPromise()
       .then(response => response.json() as JenkinsGroup[])
       .catch(this.handleError);

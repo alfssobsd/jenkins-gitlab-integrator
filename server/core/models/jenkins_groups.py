@@ -51,12 +51,12 @@ class JenkinsGroupManager(LoggingMixin):
             q = self._jenkins_job_groups.select()
 
             if name:
-                q = q.where(colums.name == name)
+                q = q.where(colums.name.startswith(name))
 
             if limit:
                 q = q.limit(limit)
 
-            q = q.order_by(desc(colums.id))
+            q = q.order_by(desc(colums.name))
 
             self._logging_debug(q)
             result = await conn.execute(q)

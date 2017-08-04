@@ -24,6 +24,8 @@ export class JenkinsGroupsComponent implements OnInit {
   }
 
   search() {
-
+    this.jenkinsGroupService
+      .searchJenkinsGroups(this.searchName)
+      .then(groups => this.jenkinsGroupList = groups)
   }
 }
