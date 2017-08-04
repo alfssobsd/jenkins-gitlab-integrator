@@ -7,7 +7,6 @@ import { JenkinsGroupService } from '../../../services/jenkins-group.service'
 @Component({
   selector: 'app-jenkins-groups',
   templateUrl: './jenkins-groups.component.html',
-  styleUrls: ['./jenkins-groups.component.css']
 })
 export class JenkinsGroupsComponent implements OnInit {
   jenkinsGroupList: JenkinsGroup[];

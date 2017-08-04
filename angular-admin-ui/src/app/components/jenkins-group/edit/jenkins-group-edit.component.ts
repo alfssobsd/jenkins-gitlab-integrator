@@ -9,7 +9,6 @@ import { JenkinsGroupService } from '../../../services/jenkins-group.service'
 @Component({
   selector: 'app-jenkins-group-edit',
   templateUrl: './jenkins-group-edit.component.html',
-  styleUrls: ['./jenkins-group-edit.component.css']
 })
 export class JenkinsGroupEditComponent implements OnInit {
   jenkinsGroup: JenkinsGroup;

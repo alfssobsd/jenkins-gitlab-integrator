@@ -9,7 +9,6 @@ import { DelayedTaskService } from '../../../services/delayed-task.service'
 @Component({
   selector: 'app-delayed-task-detail',
   templateUrl: './delayed-task-detail.component.html',
-  styleUrls: ['./delayed-task-detail.component.css']
 })
 export class DelayedTaskDetailComponent implements OnInit {
   delayedTask: DelayedTask;
