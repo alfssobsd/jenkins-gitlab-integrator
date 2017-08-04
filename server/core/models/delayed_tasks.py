@@ -1,9 +1,6 @@
 import enum
-import logging
-import datetime
-import pdb
 import hashlib
-from sqlalchemy.sql import select
+import json
 from sqlalchemy import desc
 
 from server.core.common import LoggingMixin
@@ -21,6 +18,11 @@ class RecordNotFound(Exception):
     """Requested record in database was not found"""
     pass
 
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, DelayedTask):
+            return o.values
+        return json.JSONEncoder.default(self, o)
 
 class DelayedTask(object):
     """Data class for DelayedTask"""

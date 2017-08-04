@@ -1,4 +1,3 @@
-import aiohttp
 from aiohttp.client_exceptions import ClientResponseError, ClientConnectorError
 
 from server.core.common import LoggingMixin

@@ -1,6 +1,4 @@
 import uuid
-from aiohttp import web
-
 
 async def uuid_marker_request(app, handler):
     """

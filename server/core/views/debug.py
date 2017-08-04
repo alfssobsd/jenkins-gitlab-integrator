@@ -1,5 +1,3 @@
-import logging
-
 from aiohttp import web
 from server.core.common import LoggingMixin
 from . import set_log_marker
