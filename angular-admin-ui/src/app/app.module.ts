@@ -6,16 +6,16 @@ import { HttpModule }    from '@angular/http';
 // companents
 import { AppComponent }  from './app.component';
 // config
-import { ConfigComponent } from './config/config.component';
-import { ConfigService } from './config/config.service';
+import { ConfigComponent } from './components/config/index/config.component';
+import { ConfigService } from './services/config.service';
 // gitlab webhooks
 // delayed task
-import { DelayedTasksComponent } from './delayed-task/delayed-tasks.component';
-import { DelayedTaskService } from './delayed-task/delayed-task.service';
-import { DelayedTaskDetailComponent } from './delayed-task/delayed-task-detail.component';
+import { DelayedTasksComponent } from './components/delayed-task/index/delayed-tasks.component';
+import { DelayedTaskService } from './services/delayed-task.service';
+import { DelayedTaskDetailComponent } from './components/delayed-task/show/delayed-task-detail.component';
 
 // pipe
-import { KeysPipe } from './keys.pipe';
+import { KeysPipe } from './pipes/keys.pipe';
 
 // routing
 import { AppRoutingModule } from './app-routing.module';

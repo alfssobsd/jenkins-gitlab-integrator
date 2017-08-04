@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router }            from '@angular/router';
 
-import { DelayedTaskService } from './delayed-task.service'
-import { DelayedTask } from './delayed-task'
+import { DelayedTask } from '../../../models/delayed-task'
+import { DelayedTaskService } from '../../../services/delayed-task.service'
 
 @Component({
   selector: 'app-delayed-tasks',

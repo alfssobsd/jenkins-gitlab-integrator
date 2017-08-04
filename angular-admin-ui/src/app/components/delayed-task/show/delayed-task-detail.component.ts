@@ -3,8 +3,8 @@ import { Component, OnInit }        from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location }                 from '@angular/common';
 
-import { DelayedTask }        from './delayed-task'
-import { DelayedTaskService } from './delayed-task.service'
+import { DelayedTask }        from '../../../models/delayed-task'
+import { DelayedTaskService } from '../../../services/delayed-task.service'
 
 @Component({
   selector: 'app-delayed-task-detail',

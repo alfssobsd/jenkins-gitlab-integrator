@@ -2,7 +2,7 @@ import 'rxjs/add/operator/toPromise';
 import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http'
 
-import { Config } from './config'
+import { Config } from '../models/config'
 
 @Injectable()
 export class ConfigService {

@@ -2,7 +2,7 @@ import 'rxjs/add/operator/toPromise';
 import { Injectable } from '@angular/core';
 import { Headers, Http, RequestOptions, URLSearchParams } from '@angular/http'
 
-import { DelayedTask } from './delayed-task'
+import { DelayedTask } from '../models/delayed-task'
 
 @Injectable()
 export class DelayedTaskService {
