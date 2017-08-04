@@ -1,0 +1,9 @@
+<h2>JenkinsGroup Edit</h2>
+<div *ngIf="jenkinsGroup">
+  <p>{{jenkinsGroup.name}}</p>
+  <p>{{jenkinsGroup.id}}</p>
+  <p>{{jenkinsGroup.jobs_base_path}}</p>
+</div>
+<button (click)="goBack()" class="btn btn-default">
+  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+</button>

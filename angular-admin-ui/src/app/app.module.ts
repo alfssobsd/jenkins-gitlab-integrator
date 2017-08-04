@@ -11,6 +11,7 @@ import { ConfigService } from './services/config.service';
 import { JenkinsGroupService } from './services/jenkins-group.service';
 // jenkins groups
 import { JenkinsGroupsComponent } from './components/jenkins-group/index/jenkins-groups.component';
+import { JenkinsGroupEditComponent } from './components/jenkins-group/edit/jenkins-group-edit.component';
 // delayed task
 import { DelayedTasksComponent } from './components/delayed-task/index/delayed-tasks.component';
 import { DelayedTaskService } from './services/delayed-task.service';
@@ -24,6 +25,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,7 +33,8 @@ import { AppRoutingModule } from './app-routing.module';
     DelayedTasksComponent,
     DelayedTaskDetailComponent,
     KeysPipe,
-    JenkinsGroupsComponent
+    JenkinsGroupsComponent,
+    JenkinsGroupEditComponent
   ],
   imports: [
     BrowserModule,

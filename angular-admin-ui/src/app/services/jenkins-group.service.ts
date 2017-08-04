@@ -11,6 +11,14 @@ export class JenkinsGroupService {
 
   constructor(private http: Http) {}
 
+  getJenkinsGroup(id: number): Promise<JenkinsGroup> {
+    const url = `${this.delayedTaskUrl}/${id}`;
+    return this.http.get(url)
+      .toPromise()
+      .then(response => response.json() as JenkinsGroup)
+      .catch(this.handleError);
+  }
+
   searchJenkinsGroups(name: string): Promise<JenkinsGroup[]> {
     const url = `${this.delayedTaskUrl}`;
 

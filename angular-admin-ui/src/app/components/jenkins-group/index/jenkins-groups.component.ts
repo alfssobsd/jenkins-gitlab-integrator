@@ -14,7 +14,7 @@ export class JenkinsGroupsComponent implements OnInit {
   searchName: string;
 
   constructor(
-    private jenkinsGroupService:JenkinsGroupService
+    private jenkinsGroupService:JenkinsGroupService,
   ) { }
 
   ngOnInit() {

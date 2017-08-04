@@ -64,8 +64,32 @@ class JenkinsGroupManager(LoggingMixin):
             list_data_obj = await self._mapping_from_tuple(rows)
             return list_data_obj
 
-    async def get(self, id):
-        pass
+    async def get(self, grop_id):
+        """
+        Get one JenkinsGroup object by id field
+
+        Args:
+            grop_id - value id field
+
+        Return:
+            JenkinsGroup object
+
+        Exceptions:
+                RecordNotFound
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            q = self._jenkins_job_groups.select().where(self._jenkins_job_groups.c.id == grop_id)
+            self._logging_debug(q)
+            result = await conn.execute(q)
+            row = await result.fetchone()
+            if row is None:
+                msg = "JenkinsGroup with id: {} does not exists"
+                raise RecordNotFound(msg.format(grop_id))
+            obj = await self._mapping_row_to_obj(row)
+            self._logging_debug(obj)
+            return obj
 
     async def create(self, jenkins_group):
         pass

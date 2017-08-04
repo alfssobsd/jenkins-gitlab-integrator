@@ -117,7 +117,9 @@ class AdminApiV1JenkinsGroupView(web.View, LoggingMixin):
     @create_jenkins_group_manager
     @require_permission(Permission.ADMIN_UI)
     async def get(self):
-        pass
+        group_id = self.request.match_info['id']
+        group = await self.jenkins_group_manager.get(group_id)
+        return web.json_response(group, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
     @set_log_marker
     @create_jenkins_group_manager
