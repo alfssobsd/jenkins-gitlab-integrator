@@ -20,18 +20,15 @@
 
   <div class="container-fluid">
     <div class="row">
-      <!-- {# left menu #} -->
       <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
           <li routerLinkActive="active"><a routerLink="/config">Config</a></li>
+          <li routerLinkActive="active"><a routerLink="/webhooks">Web Hooks</a></li>
           <li routerLinkActive="active"><a routerLink="/delayed-tasks">DelayedTasks</a></li>
         </ul>
       </div>
-      <!-- {# main content #} -->
       <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <!-- {% block payload %} -->
         <router-outlet></router-outlet>
-<!--         {% endblock %} -->
       </div>
     </div>
 </div>

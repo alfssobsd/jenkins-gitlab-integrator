@@ -12,6 +12,10 @@ import { ConfigService } from './config/config.service';
 // delayed task
 import { DelayedTasksComponent } from './delayed-task/delayed-tasks.component';
 import { DelayedTaskService } from './delayed-task/delayed-task.service';
+import { DelayedTaskDetailComponent } from './delayed-task/delayed-task-detail.component';
+
+// pipe
+import { KeysPipe } from './keys.pipe';
 
 // routing
 import { AppRoutingModule } from './app-routing.module';
@@ -21,7 +25,9 @@ import { AppRoutingModule } from './app-routing.module';
   declarations: [
     AppComponent,
     ConfigComponent,
-    DelayedTasksComponent
+    DelayedTasksComponent,
+    DelayedTaskDetailComponent,
+    KeysPipe
   ],
   imports: [
     BrowserModule,
