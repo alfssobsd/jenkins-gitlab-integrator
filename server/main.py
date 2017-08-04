@@ -23,7 +23,8 @@ from .core.views.gitlab import GitLabWebhookView
 from .core.views.common import LoginView, LogOutView, IndexView, StatsView
 from .core.views.admin import AdminIndexView
 from .core.views.admin_api import AdminApiV1ConfigView, AdminApiV1DelayedTasksView,\
- AdminApiV1DelayedTaskDetailView, AdminApiV1DelayedTaskChangeStatusView
+ AdminApiV1DelayedTaskDetailView, AdminApiV1DelayedTaskChangeStatusView, AdminApiV1JenkinsGroupView, \
+ AdminApiV1JenkinsGroupSearchView
 from .core.workers.gitlab_worker import GitLabWorker
 from .core.security.policy import FileAuthorizationPolicy
 
@@ -57,10 +58,20 @@ class RoutesMixin(object):
         self.app.router.add_post('/login', LoginView, name='login_post')
         self.app.router.add_get('/logout', LogOutView, name='logout')
         self.app.router.add_get('/admin', AdminIndexView, name='admin_index')
+        #Config
         self.app.router.add_get('/admin/api/v1/config', AdminApiV1ConfigView, name='admin_api_v1_config')
+        #DelayedTask
         self.app.router.add_get('/admin/api/v1/delayed-task', AdminApiV1DelayedTasksView, name='admin_api_v1_delayed_task')
         self.app.router.add_get('/admin/api/v1/delayed-task/{id}', AdminApiV1DelayedTaskDetailView, name='admin_api_v1_delayed_task_view')
         self.app.router.add_post('/admin/api/v1/delayed-task/{id}/status', AdminApiV1DelayedTaskChangeStatusView, name='admin_api_v1_delayed_task_status_view')
+        #JenkinsGroup search
+        self.app.router.add_get('/admin/api/v1/jenkins-group', AdminApiV1JenkinsGroupSearchView, name='admin_api_v1_jenkins_group_search')
+        #JenkinsGroup managment
+        self.app.router.add_post('/admin/api/v1/jenkins-group', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_create')
+        self.app.router.add_get('/admin/api/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_show')
+        self.app.router.add_put('/admin/api/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_update')
+        self.app.router.add_delete('/admin/api/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_delete')
+        #
         self.app.router.add_get('/admin/{path:.*}', AdminIndexView, name='admin_angular')
         self.app.router.add_post('/debug/post/webhook', DebugView)
         self.app.router.add_get('/debug/get/webhook', DebugView)

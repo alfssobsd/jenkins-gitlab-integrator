@@ -1,6 +1,7 @@
 #Web View
 from functools import wraps
 from server.core.models.delayed_tasks import DelayedTaskManager
+from server.core.models.jenkins_groups import JenkinsGroupManager
 
 def set_log_marker(func):
     """
@@ -24,5 +25,19 @@ def create_delayed_manager(func):
         db = self.request.app['db_pool']
         db_tables = self.request.app['sa_tables']
         self.delayed_task_manager = DelayedTaskManager(self.request.marker, db, db_tables)
+        return await func(*args)
+    return wrapper
+
+
+def create_jenkins_group_manager(func):
+    """
+        Decorator for create jenkins_group_manager object
+    """
+    @wraps(func)
+    async def wrapper(*args):
+        self = args[0]
+        db = self.request.app['db_pool']
+        db_tables = self.request.app['sa_tables']
+        self.jenkins_group_manager = JenkinsGroupManager(self.request.marker, db, db_tables)
         return await func(*args)
     return wrapper

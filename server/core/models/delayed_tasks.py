@@ -18,12 +18,6 @@ class RecordNotFound(Exception):
     """Requested record in database was not found"""
     pass
 
-class CustomEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, DelayedTask):
-            return o.values
-        return json.JSONEncoder.default(self, o)
-
 class DelayedTask(object):
     """Data class for DelayedTask"""
     def __init__(self):
@@ -121,13 +115,13 @@ class DelayedTaskManager(LoggingMixin):
         """
             Search delayed_tasks by fields
 
-            Args:
-                task_type - task type
-                task_status - task status
-                group  - group name
-                job_name - job_name
-                branch - branch
-                sha1  - sha1
+        Args:
+            task_type - task type
+            task_status - task status
+            group  - group name
+            job_name - job_name
+            branch - branch
+            sha1  - sha1
         Return:
             list[DelayedTask obj, DelayedTask obj]
 

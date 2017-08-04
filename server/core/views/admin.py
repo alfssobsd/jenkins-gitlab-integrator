@@ -4,7 +4,7 @@ from aiohttp import web
 from server.core.common import LoggingMixin
 from server.core.security.policy import require_permission, Permission
 from server.core.models.delayed_tasks import DelayedTaskStatus
-from . import set_log_marker, create_delayed_manager
+from . import set_log_marker
 
 class AdminIndexView(web.View, LoggingMixin):
     """

@@ -8,7 +8,9 @@ import { AppComponent }  from './app.component';
 // config
 import { ConfigComponent } from './components/config/index/config.component';
 import { ConfigService } from './services/config.service';
-// gitlab webhooks
+import { JenkinsGroupService } from './services/jenkins-group.service';
+// jenkins groups
+import { JenkinsGroupsComponent } from './components/jenkins-group/index/jenkins-groups.component';
 // delayed task
 import { DelayedTasksComponent } from './components/delayed-task/index/delayed-tasks.component';
 import { DelayedTaskService } from './services/delayed-task.service';
@@ -21,13 +23,15 @@ import { KeysPipe } from './pipes/keys.pipe';
 import { AppRoutingModule } from './app-routing.module';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
     ConfigComponent,
     DelayedTasksComponent,
     DelayedTaskDetailComponent,
-    KeysPipe
+    KeysPipe,
+    JenkinsGroupsComponent
   ],
   imports: [
     BrowserModule,
@@ -37,7 +41,8 @@ import { AppRoutingModule } from './app-routing.module';
   ],
   providers: [
     ConfigService,
-    DelayedTaskService
+    DelayedTaskService,
+    JenkinsGroupService
   ],
   bootstrap: [ AppComponent ]
 })

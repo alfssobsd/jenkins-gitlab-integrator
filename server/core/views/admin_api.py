@@ -6,9 +6,10 @@ import aiohttp_security
 from functools import partial
 from aiohttp import web
 from server.core.common import LoggingMixin
-from server.core.models.delayed_tasks import CustomEncoder, DelayedTaskStatus
+from server.core.models.delayed_tasks import DelayedTaskStatus
+from server.core.json_encoders import CustomJSONEncoder
 from server.core.security.policy import require_permission, Permission
-from . import set_log_marker, create_delayed_manager
+from . import set_log_marker, create_delayed_manager, create_jenkins_group_manager
 
 class AdminApiV1ConfigView(web.View, LoggingMixin):
     """
@@ -30,7 +31,7 @@ class AdminApiV1DelayedTasksView(web.View, LoggingMixin):
         form_data = self._parse_form_data(self.request.query)
         self._logging_debug(form_data)
         tasks = await self.delayed_task_manager.search(**form_data)
-        return web.json_response(tasks, dumps=partial(json.dumps, cls=CustomEncoder))
+        return web.json_response(tasks, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
 
     def _parse_form_data(self, query):
@@ -59,7 +60,7 @@ class AdminApiV1DelayedTaskDetailView(web.View, LoggingMixin):
     async def get(self):
         task_id = self.request.match_info['id']
         task = await self.delayed_task_manager.get(task_id)
-        return web.json_response(task, dumps=partial(json.dumps, cls=CustomEncoder))
+        return web.json_response(task, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
 
 class AdminApiV1DelayedTaskChangeStatusView(web.View, LoggingMixin):
@@ -81,4 +82,57 @@ class AdminApiV1DelayedTaskChangeStatusView(web.View, LoggingMixin):
         await self.delayed_task_manager.set_status(task.id, DelayedTaskStatus[task_status.upper()])
 
         task = await self.delayed_task_manager.get(task_id)
-        return web.json_response(task, dumps=partial(json.dumps, cls=CustomEncoder))
+        return web.json_response(task, dumps=partial(json.dumps, cls=CustomJSONEncoder))
+
+class AdminApiV1JenkinsGroupSearchView(web.View, LoggingMixin):
+    """
+        Admin API for search Jenkins Group
+    """
+    @set_log_marker
+    @create_jenkins_group_manager
+    @require_permission(Permission.ADMIN_UI)
+    async def get(self):
+        form_data = self._parse_form_data(self.request.query)
+        groups = await self.jenkins_group_manager.search(**form_data)
+        return web.json_response(groups, dumps=partial(json.dumps, cls=CustomJSONEncoder))
+
+
+    def _parse_form_data(self, query):
+        form_data = {
+            'name' : None,
+        }
+
+        for key in query.keys():
+            if key in form_data:
+                if query[key]:
+                    form_data[key] = query[key]
+
+        return form_data
+
+class AdminApiV1JenkinsGroupView(web.View, LoggingMixin):
+    """
+        Admin API for mangmanet Jenkins Group
+    """
+    @set_log_marker
+    @create_jenkins_group_manager
+    @require_permission(Permission.ADMIN_UI)
+    async def get(self):
+        pass
+
+    @set_log_marker
+    @create_jenkins_group_manager
+    @require_permission(Permission.ADMIN_UI)
+    async def post(self):
+        pass
+
+    @set_log_marker
+    @create_jenkins_group_manager
+    @require_permission(Permission.ADMIN_UI)
+    async def put(self):
+        pass
+
+    @set_log_marker
+    @create_jenkins_group_manager
+    @require_permission(Permission.ADMIN_UI)
+    async def delete(self):
+        pass
