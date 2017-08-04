@@ -2,7 +2,7 @@ import uuid
 import asyncio
 
 from server.core.common import LoggingMixin
-from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTaskStatus, DelayedTaskType, DelayedTask, RecordNotFound
+from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTaskType
 from server.core.services.gitlab_push_service import GitLabPushService
 from server.core.services.gitlab_merge_service import GitLabMergeService
 

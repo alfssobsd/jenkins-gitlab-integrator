@@ -1,0 +1,27 @@
+<div *ngIf="delayedTask">
+  <h2>Edit task id {{ delayedTask.id }}</h2>
+  <div class="row">
+    <div class="col-sm-6">
+      <table class="table table-str">
+        <tbody>
+          <tr *ngFor="let entry of delayedTask | keys">
+            <td >{{entry.key}}</td>
+            <td>
+              <span class="label label-success" *ngIf="entry.key == 'task_status' && entry.value == 'SUCCESS'">{{entry.value}}</span>
+              <span class="label label-info" *ngIf="entry.key == 'task_status' && entry.value == 'NEW'">{{entry.value}}</span>
+              <span class="label label-danger" *ngIf="entry.key == 'task_status' && entry.value == 'CANCELED'">{{entry.value}}</span>
+              <span *ngIf="entry.key != 'task_status'">{{entry.value}}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-6">
+      <h2>Change status</h2>
+      <button (click)="setStatus('new')" class="btn btn-info">new</button>
+      <button (click)="setStatus('canceled')" class="btn btn-danger">canceled</button>
+      <button (click)="setStatus('success')" class="btn btn-success">success</button>
+    </div>
+  </div>
+</div>
+<button (click)="goBack()" class="btn btn-default">Back</button>

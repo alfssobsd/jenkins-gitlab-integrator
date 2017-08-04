@@ -1,5 +1,3 @@
-import logging
-import aiohttp
 from aiohttp import web
 
 from server.core.common import LoggingMixin
