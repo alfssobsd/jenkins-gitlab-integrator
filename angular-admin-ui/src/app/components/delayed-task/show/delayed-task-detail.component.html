@@ -1,3 +1,9 @@
+<div class="row">
+  <button (click)="goBack()" class="btn btn-default">
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+  </button>
+</div>
+<hr>
 <div *ngIf="delayedTask">
   <h2>Edit task id {{ delayedTask.id }}</h2>
   <div class="row">
@@ -24,4 +30,3 @@
     </div>
   </div>
 </div>
-<button (click)="goBack()" class="btn btn-default">Back</button>
