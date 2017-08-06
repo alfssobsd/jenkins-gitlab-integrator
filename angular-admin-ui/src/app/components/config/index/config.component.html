@@ -1,9 +1,16 @@
-<section class="box">
-  <div *ngIf="config">
-    <figure class="highlight">
-  <pre>
-{{ config.body }}
-  </pre>
-    </figure>
-  </div>
-</section>
+<div class="row">
+  <section class="box">
+    <header>
+      <h2 class="title pull-left">Config</h2>
+    </header>
+    <div class="content-body">
+      <div *ngIf="config">
+        <figure class="highlight">
+      <pre>
+    {{ config.body }}
+      </pre>
+        </figure>
+      </div>
+    </div>
+  </section>
+</div>
