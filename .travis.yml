@@ -18,6 +18,7 @@ before_install:
   - mysql -e 'create database test_jenkins_integrator DEFAULT CHARACTER SET utf8;'
 
 script:
+  - (cd angular-admin-ui && npm install && ng build --prod -d /static/)
   - alembic -n alembic_test -c config/alembic.ini upgrade head
   - PYTHONPATH=. py.test -v
   - make build_docker_release
