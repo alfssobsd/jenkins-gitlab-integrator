@@ -1,73 +1,87 @@
-<form class="form-horizontal" autocomplete="off">
-  <div class="form-group">
-    <label class="col-sm-2 control-label">Type</label>
-    <div class="col-sm-4">
-      <select  [(ngModel)]="searchData.task_type" [ngModelOptions]="{standalone: true}" class="form-control">
-        <option *ngFor="let type of taskTypesList" [ngValue]="type.name">{{type.name}}</option>
-      </select>
+<div class="row">
+  <section class="box">
+    <header>
+      <h2 class="title pull-left">Search Tasks</h2>
+    </header>
+    <div class="content-body">
+      <form class="form-horizontal" autocomplete="off">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Type</label>
+          <div class="col-sm-4">
+            <select  [(ngModel)]="searchData.task_type" [ngModelOptions]="{standalone: true}" class="form-control">
+              <option *ngFor="let type of taskTypesList" [ngValue]="type.name">{{type.name}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Group</label>
+          <div class="col-sm-4">
+            <input [(ngModel)]="searchData.group" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="group name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Job Name</label>
+          <div class="col-sm-4">
+            <input [(ngModel)]="searchData.job_name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="job name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Branch</label>
+          <div class="col-sm-4">
+            <input [(ngModel)]="searchData.branch" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="branch">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Sha1</label>
+          <div class="col-sm-4">
+            <input [(ngModel)]="searchData.sha1" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="sha1">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-4">
+            <button (click)="search()" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </form>
     </div>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-2 control-label">Group</label>
-    <div class="col-sm-4">
-      <input [(ngModel)]="searchData.group" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="group name">
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-2 control-label">Job Name</label>
-    <div class="col-sm-4">
-      <input [(ngModel)]="searchData.job_name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="job name">
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-2 control-label">Branch</label>
-    <div class="col-sm-4">
-      <input [(ngModel)]="searchData.branch" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="branch">
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="col-sm-2 control-label">Sha1</label>
-    <div class="col-sm-4">
-      <input [(ngModel)]="searchData.sha1" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="sha1">
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-4">
-      <button (click)="search()" class="btn btn-primary">Search</button>
-    </div>
-  </div>
-</form>
+  </section>
+</div>
 
-<h2>limit 150 rows</h2>
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>task_status</th>
-      <th>task_type</th>
-      <th>group</th>
-      <th>job_name</th>
-      <th>branch</th>
-      <th>sha1</th>
-      <th>counter_attempts</th>
-      <th>gitlab_merge_comment_id</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr *ngFor="let task of delayedTasks">
-        <th>{{ task.id }}</th>
-        <td>{{ task.task_status }}</td>
-        <td>{{ task.task_type }}</td>
-        <td>{{ task.group }}</td>
-        <td>{{ task.job_name }}</td>
-        <td>{{ task.branch }}</td>
-        <td>{{ task.sha1 }}</td>
-        <td>{{ task.counter_attempts }}</td>
-        <td>{{ task.gitlab_merge_comment_id }}</td>
-        <td>
-            <a [routerLink]="['/delayed-tasks', task.id]"> Edit </a>
-        </td>
-      </tr>
-  </tbody>
-</table>
+<div class="row">
+  <section class="box">
+    <div class="content-body">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>task_status</th>
+            <th>task_type</th>
+            <th>group</th>
+            <th>job_name</th>
+            <th>branch</th>
+            <th>sha1</th>
+            <th>counter_attempts</th>
+            <th>gitlab_merge_comment_id</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let task of delayedTasks">
+              <th>{{ task.id }}</th>
+              <td>{{ task.task_status }}</td>
+              <td>{{ task.task_type }}</td>
+              <td>{{ task.group }}</td>
+              <td>{{ task.job_name }}</td>
+              <td>{{ task.branch }}</td>
+              <td>{{ task.sha1 }}</td>
+              <td>{{ task.counter_attempts }}</td>
+              <td>{{ task.gitlab_merge_comment_id }}</td>
+              <td>
+                  <a [routerLink]="['/delayed-tasks', task.id]"> Edit </a>
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

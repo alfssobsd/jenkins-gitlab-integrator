@@ -47,12 +47,10 @@ class LogOutView(web.View, LoggingMixin):
 
 class IndexView(web.View, LoggingMixin):
     """
-         Stub for root page, redirect to login / -> /login
+        index.html
     """
     async def get(self):
-        login_url = self.request.app.router['login'].url()
-        response = web.HTTPFound(login_url)
-        return response
+        return web.FileResponse(str( self.request.app['PROJECT_ROOT']  / 'static/index.html') )
 
 class StatsView(web.View, LoggingMixin):
     """

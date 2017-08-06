@@ -5,6 +5,8 @@ import { HttpModule }    from '@angular/http';
 
 // companents
 import { AppComponent }  from './app.component';
+import { NgbModule }     from '@ng-bootstrap/ng-bootstrap';
+import { StatsService } from './services/stats.service';
 // config
 import { ConfigComponent } from './components/config/index/config.component';
 import { ConfigService } from './services/config.service';
@@ -23,9 +25,6 @@ import { KeysPipe } from './pipes/keys.pipe';
 // routing
 import { AppRoutingModule } from './app-routing.module';
 
-
-
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -37,12 +36,14 @@ import { AppRoutingModule } from './app-routing.module';
     JenkinsGroupEditComponent
   ],
   imports: [
+    NgbModule.forRoot(),
     BrowserModule,
     FormsModule,
     HttpModule,
     AppRoutingModule
   ],
   providers: [
+    StatsService,
     ConfigService,
     DelayedTaskService,
     JenkinsGroupService
