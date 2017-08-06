@@ -21,7 +21,7 @@ before_install:
 script:
   - (cd angular-admin-ui && npm install && ng build --prod -d /static/)
   - alembic -n alembic_test -c config/alembic.ini upgrade head
-  - PYTHONPATH=. py.test -v
+  - PYTHONPATH=. py.test -v tests
   - make build_docker_release
 
 deploy:
