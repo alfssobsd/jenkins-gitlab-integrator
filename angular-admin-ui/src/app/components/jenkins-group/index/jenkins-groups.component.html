@@ -68,7 +68,7 @@
               <td>{{group.jobs_base_path}}</td>
               <td>
                 <a [routerLink]="['/jenkins-groups', group.id]"> Edit </a>
-                <a (click)="delete(group)"> Delete </a>
+                <a (click)="delete(group)" href="javascript:void(0)" > Delete </a>
               </td>
             </tr>
           </tbody>
