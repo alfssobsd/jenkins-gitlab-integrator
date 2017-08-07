@@ -14,6 +14,7 @@ class AdminApiV1DelayedTasksView(web.View, LoggingMixin):
     """
         Admin API List/Search DelayedTask v1
     """
+
     @set_log_marker
     @create_delayed_manager
     @require_permission(Permission.ADMIN_UI)
@@ -23,14 +24,13 @@ class AdminApiV1DelayedTasksView(web.View, LoggingMixin):
         tasks = await self.delayed_task_manager.search(**form_data)
         return web.json_response(tasks, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
-
     def _parse_form_data(self, query):
         form_data = {
-            'task_type' : 'GITLAB_MERGE_REQ',
-            'group' : None,
-            'job_name' : None,
-            'branch' : None,
-            'sha1' : None,
+            'task_type': 'GITLAB_MERGE_REQ',
+            'group': None,
+            'job_name': None,
+            'branch': None,
+            'sha1': None,
         }
 
         for key in query.keys():
@@ -40,10 +40,12 @@ class AdminApiV1DelayedTasksView(web.View, LoggingMixin):
 
         return form_data
 
+
 class AdminApiV1DelayedTaskDetailView(web.View, LoggingMixin):
     """
         Admin API edit DelayedTask v1
     """
+
     @set_log_marker
     @create_delayed_manager
     @require_permission(Permission.ADMIN_UI)
@@ -57,6 +59,7 @@ class AdminApiV1DelayedTaskChangeStatusView(web.View, LoggingMixin):
     """
         Admin API change status DelayedTask v1
     """
+
     @set_log_marker
     @create_delayed_manager
     @require_permission(Permission.ADMIN_UI)

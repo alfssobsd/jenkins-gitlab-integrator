@@ -5,11 +5,13 @@ from server.core.clients.gitlab_client import GitLabPush
 from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTask, RecordNotFound
 from server.core.clients.jenkins_client import JenkinsClient
 
+
 class GitLabPushService(LoggingMixin):
     """
     Processing push message from gitlab
 
     """
+
     def __init__(self, marker, db, db_tables, jenkins_config, gitlab_config, workers_config, loop=None):
         """
         Args:
@@ -28,11 +30,10 @@ class GitLabPushService(LoggingMixin):
         self._gitlab_config = gitlab_config
         self._workers_config = workers_config
         self._jenkins_client = JenkinsClient(self._marker,
-                                            jenkins_config['user_id'],
-                                            jenkins_config['api_token'],
-                                            loop = self._loop)
+                                             jenkins_config['user_id'],
+                                             jenkins_config['api_token'],
+                                             loop=self._loop)
         self._delayed_task_manager = DelayedTaskManager(self._marker, db, db_tables)
-
 
     async def exec_raw(self, group, job_name, gitlab_push_raw_data):
         """
@@ -46,7 +47,7 @@ class GitLabPushService(LoggingMixin):
         gitlab_push_obj = GitLabPush.from_push_data(gitlab_push_raw_data)
         self._logging_info(gitlab_push_obj)
 
-        #don`t start with empty sha or branch
+        # don`t start with empty sha or branch
         if gitlab_push_obj.sha1 is None or gitlab_push_obj.branch is None:
             self._logging_info("Skip push %s " % (gitlab_push_obj))
         else:
@@ -87,8 +88,8 @@ class GitLabPushService(LoggingMixin):
             for chain in self._get_chains_from_group(group):
                 for job in self._get_jobs_from_chains(group, chain):
                     await self._jenkins_client.job_exists(self._get_jobs_base_path_from_group(group),
-                                                            job,
-                                                            branch)
+                                                          job,
+                                                          branch)
         except (ClientResponseError) as e:
             self._logging_debug(e)
             return False
@@ -96,7 +97,6 @@ class GitLabPushService(LoggingMixin):
             self._logging_error(e)
             return False
         return True
-
 
     async def _start_first_job(self, delayed_task):
         """
@@ -106,8 +106,8 @@ class GitLabPushService(LoggingMixin):
             delayed_task - DelayedTask obj
         """
         await self._jenkins_client.build(self._get_jobs_base_path_from_group(delayed_task.group),
-                                        self._get_first_job_from_group(delayed_task.group),
-                                        delayed_task.branch)
+                                         self._get_first_job_from_group(delayed_task.group),
+                                         delayed_task.branch)
         try:
             n_delayed_task = await self._delayed_task_manager.get_by_uniq_md5sum(delayed_task.uniq_md5sum)
             await self._delayed_task_manager.set_status_success(n_delayed_task.id)

@@ -14,6 +14,7 @@ class AdminApiV1JenkinsGroupSearchView(web.View, LoggingMixin):
     """
         Admin API for search Jenkins Group
     """
+
     @set_log_marker
     @create_jenkins_group_manager
     @require_permission(Permission.ADMIN_UI)
@@ -22,10 +23,9 @@ class AdminApiV1JenkinsGroupSearchView(web.View, LoggingMixin):
         groups = await self.jenkins_group_manager.search(**form_data)
         return web.json_response(groups, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
-
     def _parse_form_data(self, query):
         form_data = {
-            'name' : None,
+            'name': None,
         }
 
         for key in query.keys():
@@ -35,10 +35,12 @@ class AdminApiV1JenkinsGroupSearchView(web.View, LoggingMixin):
 
         return form_data
 
+
 class AdminApiV1JenkinsGroupView(web.View, LoggingMixin):
     """
         Admin API for mangmanet Jenkins Group
     """
+
     @set_log_marker
     @create_jenkins_group_manager
     @require_permission(Permission.ADMIN_UI)

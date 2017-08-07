@@ -1,17 +1,18 @@
 import aiohttp
 from server.core.common import LoggingMixin
 
-
 _JOB_FULL_PATH = '%(job_base_path)s/job/%(job_name)s/job/%(branch)s'
 _JOB_INFO = '%(job_full_path)s/api/json?depth=0'
-#BUILD_INFO = '%(job_full_path)s/%(number)d/api/json'
+# BUILD_INFO = '%(job_full_path)s/%(number)d/api/json'
 _LAST_SUCCESS_BUILD_INFO = '%(job_full_path)s/lastSuccessfulBuild/api/json'
 _BUILD_JOB = '%(job_full_path)s/build'
+
 
 class JenkinsBuildInfo(object):
     """
         Data class for job build info
     """
+
     def __init__(self):
         self.number = 0
         self.upsteram_build_number = None
@@ -57,7 +58,7 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         URL = self._job_url(_BUILD_JOB,
-            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+                            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
         self._logging_info("url=%s" % URL)
         data = aiohttp.FormData()
         data.add_field('json', '{"parameter": []}', content_type='text/plain')
@@ -85,7 +86,7 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         URL = self._job_url(_LAST_SUCCESS_BUILD_INFO,
-            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+                            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
         self._logging_info("url=%s" % URL)
 
         response_data, response_status = await self._get_request_json(URL)
@@ -110,7 +111,7 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         URL = self._job_url(_JOB_INFO,
-            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+                            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
         self._logging_info("url=%s" % URL)
 
         response_data, response_status = await self._get_request_json(URL)
@@ -118,9 +119,8 @@ class JenkinsClient(LoggingMixin):
 
         return response_data
 
-
-    #pirvet methods
-    def _job_url(self, url_template ,**kw):
+    # pirvet methods
+    def _job_url(self, url_template, **kw):
         """
         Make API url
 
@@ -144,7 +144,7 @@ class JenkinsClient(LoggingMixin):
         Return:
             URL
         """
-        return _JOB_FULL_PATH % { 'job_base_path': job_base_path, 'job_name': job_name, 'branch': branch}
+        return _JOB_FULL_PATH % {'job_base_path': job_base_path, 'job_name': job_name, 'branch': branch}
 
     async def _get_request_json(self, URL):
         """
@@ -246,4 +246,3 @@ class JenkinsClient(LoggingMixin):
                             continue
 
         return build_info
-

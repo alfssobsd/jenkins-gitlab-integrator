@@ -9,15 +9,17 @@ _MERGE_REQUEST_COMMENT = "%(base_url)s/api/v4/projects/%(project_id)d/merge_requ
 
 
 class GitLabMergeState(enum.Enum):
-    OPENED = 1 #check and create task
-    REOPENED = 2 #check and create task
-    MERGED = 98 #need start push
-    CLOSED = 99 #do noting
+    OPENED = 1  # check and create task
+    REOPENED = 2  # check and create task
+    MERGED = 98  # need start push
+    CLOSED = 99  # do noting
+
 
 class GitLabMerge(object):
     """
     GitLab Merge info data class
     """
+
     def __init__(self):
         self.merge_id = 0
         self.project_id = 0
@@ -39,9 +41,9 @@ class GitLabMerge(object):
 
     def __repr__(self):
         msg = "GitLabMerge project_id = %s, merge_id = %s, state = %s " % \
-            (self.project_id, self.merge_id, self.state)
+              (self.project_id, self.merge_id, self.state)
         msg += " target_branch = %s, source_branch = %s sha1 = %s" % \
-            (self.target_branch, self.source_branch, self.sha1)
+               (self.target_branch, self.source_branch, self.sha1)
         return msg
 
     @staticmethod
@@ -68,10 +70,12 @@ class GitLabMerge(object):
 
         return obj
 
+
 class GitLabPush(object):
     """
     Data class for push object
     """
+
     def __init__(self):
         self.branch = None
         self.sha1 = None
@@ -79,7 +83,7 @@ class GitLabPush(object):
 
     def __repr__(self):
         return "branch = %s, sha1 = %s, project_id = %s" % \
-                (self.branch, self.sha1, self.project_id)
+               (self.branch, self.sha1, self.project_id)
 
     @staticmethod
     def from_push_data(gitlab_push_data):
@@ -89,10 +93,12 @@ class GitLabPush(object):
         gitlab_push_obj.project_id = gitlab_push_data['project_id']
         return gitlab_push_obj
 
+
 class GitLabClient(LoggingMixin):
     """
         Async gitlab api client
     """
+
     def __init__(self, marker, base_url, access_token, loop=None):
         """
             Args:
@@ -144,7 +150,7 @@ class GitLabClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         url = self._api_url(_MERGE_REQUEST, **{'base_url': self._base_url,
-                            'project_id': project_id, 'merge_id': merge_id})
+                                               'project_id': project_id, 'merge_id': merge_id})
         self._logging_info("url=%s" % url)
         data, status = await self._get_request(url)
         self._logging_info("status = %d" % status)
@@ -168,7 +174,7 @@ class GitLabClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         url = self._api_url(_MERGE_REQUEST_COMMENTS, **{'base_url': self._base_url,
-                            'project_id': project_id, 'merge_id': merge_id})
+                                                        'project_id': project_id, 'merge_id': merge_id})
         self._logging_info("url=%s" % url)
         data, status = await self._post_request(url, {'body': message})
         self._logging_info("status = %d" % status)
@@ -193,7 +199,8 @@ class GitLabClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         url = self._api_url(_MERGE_REQUEST_COMMENT, **{'base_url': self._base_url,
-                            'project_id': project_id, 'merge_id': merge_id, 'comment_id': comment_id})
+                                                       'project_id': project_id, 'merge_id': merge_id,
+                                                       'comment_id': comment_id})
         self._logging_info("url=%s" % url)
         data, status = await self._put_request(url, {'body': message})
         self._logging_info("status = %d" % status)
@@ -281,6 +288,3 @@ class GitLabClient(LoggingMixin):
             URL
         """
         return url_template % kw
-
-
-

@@ -4,18 +4,21 @@ from functools import wraps
 from aiohttp import web
 from aiohttp_security.abc import AbstractAuthorizationPolicy
 
+
 class Permission(enum.Enum):
     """
         App permissions
     """
-    ONLY_AUTH = 0 #only auth user
-    GITLAB_HOOKS = 1 #can use gitlab hooks
-    ADMIN_UI = 2 #can user admin ui
+    ONLY_AUTH = 0  # only auth user
+    GITLAB_HOOKS = 1  # can use gitlab hooks
+    ADMIN_UI = 2  # can user admin ui
+
 
 class FileAuthorizationPolicy(AbstractAuthorizationPolicy):
     """
     Implement Authorization Policy
     """
+
     def __init__(self, users):
         self.users = users
 
@@ -72,7 +75,7 @@ class FileAuthorizationPolicy(AbstractAuthorizationPolicy):
         return False
 
 
-async def check_credentials(users, username=None, password=None, token = None):
+async def check_credentials(users, username=None, password=None, token=None):
     """
         Check user credentials
 
@@ -94,9 +97,11 @@ async def check_credentials(users, username=None, password=None, token = None):
             return True, user['username']
     return False, None
 
+
 async def check_permission(request, permission):
     has_perm = await aiohttp_security.permits(request, permission.name)
     return has_perm
+
 
 async def is_authenticated(request):
     """
@@ -111,6 +116,7 @@ async def is_authenticated(request):
             False - if not auth
     """
     return (await check_permission(request, Permission.ONLY_AUTH))
+
 
 async def logout(request):
     """
@@ -133,13 +139,14 @@ def auth_by_gitlab_token(func):
     """
         Decorator auth by X-Gitlab-Token in view
     """
+
     @wraps(func)
     async def wrapper(*args):
         request = args[0].request
         users = request.app['config']['users']
         valid_token = False
         try:
-            auth_success, username = await check_credentials(users, token = request.headers['X-Gitlab-Token'])
+            auth_success, username = await check_credentials(users, token=request.headers['X-Gitlab-Token'])
             if auth_success:
                 valid_token = True
                 response = web.HTTPFound("/")
@@ -151,7 +158,9 @@ def auth_by_gitlab_token(func):
                 message = 'Incorrect X-Gitlab-Token'
                 raise web.HTTPUnauthorized(text=message)
         return await func(*args)
+
     return wrapper
+
 
 def require_permission(permission):
     """
@@ -160,6 +169,7 @@ def require_permission(permission):
         Args:
             Permission - object
     """
+
     def wrapper(func):
         @wraps(func)
         async def wrapped(*args):
@@ -169,5 +179,7 @@ def require_permission(permission):
                 message = 'You has no permission'
                 raise web.HTTPForbidden(text=message)
             return await func(*args)
+
         return wrapped
+
     return wrapper
