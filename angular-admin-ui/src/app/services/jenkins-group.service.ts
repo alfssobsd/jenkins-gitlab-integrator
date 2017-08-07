@@ -7,7 +7,7 @@ import { JenkinsGroup } from '../models/jenkins-group'
 @Injectable()
 export class JenkinsGroupService {
   private headers = new Headers({'Content-Type': 'application/json'});
-  private jenkinsGroupUrl = '/admin/api/v1/jenkins-group';
+  private jenkinsGroupUrl = '/api/admin/v1/jenkins-group';
 
   constructor(private http: Http) {}
 

@@ -19,6 +19,7 @@ from server.core.views.api.admin_config import AdminApiV1ConfigView
 from server.core.views.api.admin_delayed_tasks import AdminApiV1DelayedTasksView, AdminApiV1DelayedTaskDetailView, \
     AdminApiV1DelayedTaskChangeStatusView
 from server.core.views.api.admin_jenkins_group import AdminApiV1JenkinsGroupSearchView, AdminApiV1JenkinsGroupView
+from server.core.views.api.admin_jenkins_job import AdminApiV1JenkinsJobListView
 from server.core.views.api.common import StatsApiV1View, LoginApiV1View
 from server.utils import TRAFARET
 from .core.views.debug import DebugView
@@ -45,22 +46,24 @@ class RoutesMixin(object):
         self.app.router.add_get('/ui/', IndexUIView, name='index_ui_root')
         self.app.router.add_get('/ui/{path:.*}', IndexUIView, name='index_ui')
         #api common
-        self.app.router.add_get('/api/v1/stats', StatsApiV1View, name='api_v1_stats')
-        self.app.router.add_post('/api/v1/login', LoginApiV1View, name='api_v1_login')
-        self.app.router.add_delete('/api/v1/logout', LoginApiV1View, name='api_v1_logout')
+        self.app.router.add_get('/api/v1/stats', StatsApiV1View)
+        self.app.router.add_post('/api/v1/login', LoginApiV1View)
+        self.app.router.add_delete('/api/v1/logout', LoginApiV1View)
         #Config
-        self.app.router.add_get('/admin/api/v1/config', AdminApiV1ConfigView, name='admin_api_v1_config')
+        self.app.router.add_get('/api/admin/v1/config', AdminApiV1ConfigView)
         #DelayedTask
-        self.app.router.add_get('/admin/api/v1/delayed-task', AdminApiV1DelayedTasksView, name='admin_api_v1_delayed_task')
-        self.app.router.add_get('/admin/api/v1/delayed-task/{id}', AdminApiV1DelayedTaskDetailView, name='admin_api_v1_delayed_task_view')
-        self.app.router.add_post('/admin/api/v1/delayed-task/{id}/status', AdminApiV1DelayedTaskChangeStatusView, name='admin_api_v1_delayed_task_status_view')
+        self.app.router.add_get('/api/admin/v1/delayed-task', AdminApiV1DelayedTasksView)
+        self.app.router.add_get('/api/admin/v1/delayed-task/{id}', AdminApiV1DelayedTaskDetailView)
+        self.app.router.add_post('/api/admin/v1/delayed-task/{id}/status', AdminApiV1DelayedTaskChangeStatusView)
         #JenkinsGroup search
-        self.app.router.add_get('/admin/api/v1/jenkins-group', AdminApiV1JenkinsGroupSearchView, name='admin_api_v1_jenkins_group_search')
+        self.app.router.add_get('/api/admin/v1/jenkins-group', AdminApiV1JenkinsGroupSearchView)
         #JenkinsGroup managment
-        self.app.router.add_post('/admin/api/v1/jenkins-group', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_create')
-        self.app.router.add_get('/admin/api/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_show')
-        self.app.router.add_put('/admin/api/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_update')
-        self.app.router.add_delete('/admin/api/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView, name='admin_api_v1_jenkins_group_delete')
+        self.app.router.add_post('/api/admin/v1/jenkins-group', AdminApiV1JenkinsGroupView)
+        self.app.router.add_get('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        self.app.router.add_put('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        self.app.router.add_delete('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        #Jenkins Group List
+        self.app.router.add_get('/api/admin/v1/jenkins_job/{group_id}/', AdminApiV1JenkinsJobListView)
         #
         self.app.router.add_post('/debug/post/webhook', DebugView)
         self.app.router.add_get('/debug/get/webhook', DebugView)
