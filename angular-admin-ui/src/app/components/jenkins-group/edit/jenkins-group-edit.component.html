@@ -25,9 +25,8 @@
         <h2 class="title pull-left">jobs in group</h2>
       </header>
       <div class="content-body">
-        <ul>
-          <li>job1</li>
-          <li>job2</li>
+        <ul *ngFor="let job of jenkinsJobList">
+          <li>#{{ job.id }} {{ job.name }} / {{ job.gitlab_project_id}} / {{ job.jenkins_job_perent_id}}</li>
         </ul>
       </div>
     </section>

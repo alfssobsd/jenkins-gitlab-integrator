@@ -5,6 +5,8 @@ import { Location }                 from '@angular/common';
 
 import { JenkinsGroup } from '../../../models/jenkins-group'
 import { JenkinsGroupService } from '../../../services/jenkins-group.service'
+import { JenkinsJob } from "../../../models/jenkins-job";
+import { JenkinsJobService } from "../../../services/jenkins-job.service";
 
 @Component({
   selector: 'app-jenkins-group-edit',
@@ -12,9 +14,11 @@ import { JenkinsGroupService } from '../../../services/jenkins-group.service'
 })
 export class JenkinsGroupEditComponent implements OnInit {
   jenkinsGroup: JenkinsGroup;
+  jenkinsJobList: JenkinsJob[];
 
   constructor(
     private jenkinsGroupService:JenkinsGroupService,
+    private jenkinsJobServices: JenkinsJobService,
     private route: ActivatedRoute,
     private location: Location
   ) { }
@@ -23,6 +27,10 @@ export class JenkinsGroupEditComponent implements OnInit {
     this.route.paramMap
       .switchMap((params: ParamMap) => this.jenkinsGroupService.getJenkinsGroup(+params.get('id')))
       .subscribe(group => this.jenkinsGroup = group);
+
+    this.route.paramMap
+      .switchMap((params: ParamMap) => this.jenkinsJobServices.getJenkinsJobs(+params.get('id')))
+      .subscribe(jobs => this.jenkinsJobList = jobs);
   }
 
   save(): void {

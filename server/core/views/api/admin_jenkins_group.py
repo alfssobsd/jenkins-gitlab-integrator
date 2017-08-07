@@ -7,7 +7,7 @@ from server.core.common import LoggingMixin
 from server.core.json_encoders import CustomJSONEncoder
 from server.core.models.jenkins_groups import JenkinsGroup
 from server.core.security.policy import require_permission, Permission
-from server.core.views import create_jenkins_group_manager, set_log_marker
+from server.core.views import create_jenkins_group_manager, set_log_marker, create_jenkins_job_manager
 
 
 class AdminApiV1JenkinsGroupSearchView(web.View, LoggingMixin):
@@ -80,7 +80,12 @@ class AdminApiV1JenkinsGroupView(web.View, LoggingMixin):
 
     @set_log_marker
     @create_jenkins_group_manager
+    @create_jenkins_job_manager
     @require_permission(Permission.ADMIN_UI)
     async def delete(self):
+        jobs = await  self.jenkins_job_manager.find_by_groud_id(int(self.request.match_info['id']))
+        for job in jobs:
+            await self.jenkins_job_manager.delete(job.id)
+
         group = await self.jenkins_group_manager.delete(self.request.match_info['id'])
         return web.json_response({})

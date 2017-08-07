@@ -9,10 +9,13 @@ import { StatsService } from './services/stats.service';
 // config
 import { ConfigComponent } from './components/config/index/config.component';
 import { ConfigService } from './services/config.service';
-import { JenkinsGroupService } from './services/jenkins-group.service';
 // jenkins groups
+import { JenkinsGroupService } from './services/jenkins-group.service';
 import { JenkinsGroupsComponent } from './components/jenkins-group/index/jenkins-groups.component';
 import { JenkinsGroupEditComponent } from './components/jenkins-group/edit/jenkins-group-edit.component';
+// jenkins jobs
+import { JenkinsJobService } from "./services/jenkins-job.service"
+
 // delayed task
 import { DelayedTasksComponent } from './components/delayed-task/index/delayed-tasks.component';
 import { DelayedTaskService } from './services/delayed-task.service';
@@ -56,7 +59,8 @@ import { AppRoutingModule } from './app-routing.module';
     StatsService,
     ConfigService,
     DelayedTaskService,
-    JenkinsGroupService
+    JenkinsGroupService,
+    JenkinsJobService
   ],
   bootstrap: [ AppComponent ]
 })

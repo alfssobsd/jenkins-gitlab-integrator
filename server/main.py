@@ -40,7 +40,6 @@ class RoutesMixin(object):
 
     def setup_routes(self):
         self.app['PROJECT_ROOT'] = self.PROJECT_ROOT
-        self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
         #ui
         self.app.router.add_get('/', IndexView, name='index')
         self.app.router.add_get('/ui/', IndexUIView, name='index_ui_root')
@@ -63,12 +62,12 @@ class RoutesMixin(object):
         self.app.router.add_put('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
         self.app.router.add_delete('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
         #Jenkins Group List
-        self.app.router.add_get('/api/admin/v1/jenkins_job/{group_id}/', AdminApiV1JenkinsJobListView)
+        self.app.router.add_get('/api/admin/v1/jenkins-job/{group_id}', AdminApiV1JenkinsJobListView)
         #
         self.app.router.add_post('/debug/post/webhook', DebugView)
         self.app.router.add_get('/debug/get/webhook', DebugView)
         self.app.router.add_post('/gitlab/group/{group}/job/{job_name}', GitLabWebhookView)
-
+        self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
 
 class CommandLineOptionsMixin(object):
     def read_cmdline(self, argv):
