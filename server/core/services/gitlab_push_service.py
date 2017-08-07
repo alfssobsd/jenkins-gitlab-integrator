@@ -1,7 +1,8 @@
 from aiohttp.client_exceptions import ClientResponseError, ClientConnectorError
+
 from server.core.common import LoggingMixin
-from server.core.clients.gitlab_client import GitLabClient, GitLabMergeState, GitLabPush
-from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTaskStatus, DelayedTaskType, DelayedTask, RecordNotFound
+from server.core.clients.gitlab_client import GitLabPush
+from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTask, RecordNotFound
 from server.core.clients.jenkins_client import JenkinsClient
 
 class GitLabPushService(LoggingMixin):

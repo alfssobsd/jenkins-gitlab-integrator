@@ -15,13 +15,15 @@ from aiomysql.sa import create_engine
 from trafaret_config import commandline
 
 import server.middlewares as middlewares
+from server.core.views.api.admin_config import AdminApiV1ConfigView
+from server.core.views.api.admin_delayed_tasks import AdminApiV1DelayedTasksView, AdminApiV1DelayedTaskDetailView, \
+    AdminApiV1DelayedTaskChangeStatusView
+from server.core.views.api.admin_jenkins_group import AdminApiV1JenkinsGroupSearchView, AdminApiV1JenkinsGroupView
+from server.core.views.api.common import StatsApiV1View, LoginApiV1View
 from server.utils import TRAFARET
 from .core.views.debug import DebugView
 from .core.views.gitlab import GitLabWebhookView
-from .core.views.common import LoginApiV1View, IndexUIView, IndexView, StatsView
-from .core.views.admin_api import AdminApiV1ConfigView, AdminApiV1DelayedTasksView,\
- AdminApiV1DelayedTaskDetailView, AdminApiV1DelayedTaskChangeStatusView, AdminApiV1JenkinsGroupView, \
- AdminApiV1JenkinsGroupSearchView
+from .core.views.common import IndexUIView, IndexView
 from .core.workers.gitlab_worker import GitLabWorker
 from .core.security.policy import FileAuthorizationPolicy
 
@@ -37,11 +39,13 @@ class RoutesMixin(object):
 
     def setup_routes(self):
         self.app['PROJECT_ROOT'] = self.PROJECT_ROOT
+        self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
+        #ui
         self.app.router.add_get('/', IndexView, name='index')
         self.app.router.add_get('/ui/', IndexUIView, name='index_ui_root')
         self.app.router.add_get('/ui/{path:.*}', IndexUIView, name='index_ui')
-        self.app.router.add_get('/api/v1/stats', StatsView, name='api_v1_stats')
-        self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
+        #api common
+        self.app.router.add_get('/api/v1/stats', StatsApiV1View, name='api_v1_stats')
         self.app.router.add_post('/api/v1/login', LoginApiV1View, name='api_v1_login')
         self.app.router.add_delete('/api/v1/logout', LoginApiV1View, name='api_v1_logout')
         #Config

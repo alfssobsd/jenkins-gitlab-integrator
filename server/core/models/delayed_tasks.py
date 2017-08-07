@@ -4,6 +4,7 @@ import json
 from sqlalchemy import desc
 
 from server.core.common import LoggingMixin
+from server.core.models import RecordNotFound
 
 class DelayedTaskStatus(enum.Enum):
     NEW = 1
@@ -13,10 +14,6 @@ class DelayedTaskStatus(enum.Enum):
 class DelayedTaskType(enum.Enum):
     GITLAB_MERGE_REQ = 1
     GITLAB_PUSH = 2
-
-class RecordNotFound(Exception):
-    """Requested record in database was not found"""
-    pass
 
 class DelayedTask(object):
     """Data class for DelayedTask"""
