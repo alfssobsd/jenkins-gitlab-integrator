@@ -1,30 +1,36 @@
 <div class="row">
-  <button (click)="goBack()" class="btn btn-default">
-    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
-  </button>
-</div>
-<hr>
-<div class="row">
-  <div class="col-sm-4">
-    <h3>JenkinsGroup Edit ({{ jenkinsGroup.name }})</h3>
-    <form *ngIf="jenkinsGroup">
-      <div class="form-group">
-        <label>id</label>
-        <input [(ngModel)]="jenkinsGroup.id" [ngModelOptions]="{standalone: true}" class="form-control" readonly>
+  <div class="col-md-4">
+    <section *ngIf="jenkinsGroup" class="box">
+      <header>
+        <h2 class="title pull-left">Group (id:{{ jenkinsGroup.id }})</h2>
+      </header>
+      <div class="content-body">
+        <form>
+          <div class="form-group">
+            <label>name</label>
+            <input [(ngModel)]="jenkinsGroup.name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="name">
+          </div>
+          <div class="form-group">
+            <label>jobs_base_path</label>
+            <input [(ngModel)]="jenkinsGroup.jobs_base_path" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="http://jenkins.server/job/folder">
+          </div>
+          <button (click)="save()" class="btn btn-default">Save</button>
+        </form>
       </div>
-      <div class="form-group">
-        <label>name</label>
-        <input [(ngModel)]="jenkinsGroup.name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="name">
-      </div>
-      <div class="form-group">
-        <label>jobs_base_path</label>
-        <input [(ngModel)]="jenkinsGroup.jobs_base_path" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="http://jenkins.server/job/folder">
-      </div>
-      <button (click)="save()" class="btn btn-default">Save</button>
-    </form>
+    </section>
   </div>
-  <div class="col-sm-4">
-    <h3>Jobs</h3>
+  <div class="col-md-4">
+    <section class="box">
+      <header>
+        <h2 class="title pull-left">jobs in group</h2>
+      </header>
+      <div class="content-body">
+        <ul>
+          <li>job1</li>
+          <li>job2</li>
+        </ul>
+      </div>
+    </section>
   </div>
 </div>
 

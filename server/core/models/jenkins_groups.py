@@ -92,13 +92,87 @@ class JenkinsGroupManager(LoggingMixin):
             return obj
 
     async def create(self, jenkins_group):
-        pass
+        """
+        Create JenkinsGroup object
+
+        Args:
+            jenkins_group - JenkinsGroup object
+
+        Return:
+            DelayedTask object
+
+        Exceptions:
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            self._logging_debug(jenkins_group.values)
+            trans = await conn.begin()
+            try:
+                q = self._jenkins_job_groups.insert().\
+                    values(jenkins_group.values)
+                result = await conn.execute(q)
+                await trans.commit()
+                self._logging_debug('Commit')
+                return (await self.get(result.lastrowid))
+            except Exception as e:
+                self._logging_debug('Rollback')
+                await trans.rollback()
+                raise
 
     async def update(self, jenkins_group):
-        pass
+        """
+        Update values
 
-    async def delete(self, jenkins_group):
-        pass
+        Args:
+            jenkins_group - JenkinsGroup
+
+        Return:
+            None
+
+        Exceptions:
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            trans = await conn.begin()
+            try:
+                q = self._jenkins_job_groups.\
+                    update(self._jenkins_job_groups.c.id == jenkins_group.id).\
+                    values(jenkins_group.values)
+                self._logging_debug(q)
+                await conn.execute(q)
+                await trans.commit()
+            except Exception as e:
+                self._logging_debug('Rollback')
+                await trans.rollback()
+                raise
+
+    async def delete(self, grop_id):
+        """
+        Delete row
+
+        Args:
+            grop_id - JenkinsGroup id
+
+        Return:
+            None
+
+        Exceptions:
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            trans = await conn.begin()
+            try:
+                q = self._jenkins_job_groups.delete(self._jenkins_job_groups.c.id == grop_id)
+                self._logging_debug(q)
+                await conn.execute(q)
+                await trans.commit()
+            except Exception as e:
+                self._logging_debug('Rollback')
+                await trans.rollback()
+                raise
 
     #private methods
     def _columns(self):

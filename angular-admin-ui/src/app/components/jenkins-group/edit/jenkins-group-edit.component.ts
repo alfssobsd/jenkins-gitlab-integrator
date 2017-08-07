@@ -26,7 +26,8 @@ export class JenkinsGroupEditComponent implements OnInit {
   }
 
   save(): void {
-
+    this.jenkinsGroupService.updateJenkinsGroup(this.jenkinsGroup.id, this.jenkinsGroup)
+      .then(group => this.jenkinsGroup = group)
   }
 
   goBack(): void {

@@ -20,7 +20,7 @@ class IndexUIView(web.View, LoggingMixin):
         index.html
     """
     async def get(self):
-        return web.FileResponse(str( self.request.app['PROJECT_ROOT']  / 'static/index.html') )
+        return web.FileResponse(str( self.request.app['PROJECT_ROOT']  / 'static' / 'index.html') )
 
 class StatsView(web.View, LoggingMixin):
     """

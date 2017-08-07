@@ -7,12 +7,12 @@ import { JenkinsGroup } from '../models/jenkins-group'
 @Injectable()
 export class JenkinsGroupService {
   private headers = new Headers({'Content-Type': 'application/json'});
-  private delayedTaskUrl = '/admin/api/v1/jenkins-group';
+  private jenkinsGroupUrl = '/admin/api/v1/jenkins-group';
 
   constructor(private http: Http) {}
 
   getJenkinsGroup(id: number): Promise<JenkinsGroup> {
-    const url = `${this.delayedTaskUrl}/${id}`;
+    const url = `${this.jenkinsGroupUrl}/${id}`;
     return this.http.get(url)
       .toPromise()
       .then(response => response.json() as JenkinsGroup)
@@ -20,7 +20,7 @@ export class JenkinsGroupService {
   }
 
   searchJenkinsGroups(name: string): Promise<JenkinsGroup[]> {
-    const url = `${this.delayedTaskUrl}`;
+    const url = `${this.jenkinsGroupUrl}`;
 
     let params: URLSearchParams = new URLSearchParams();
     params.set("name", name);
@@ -28,6 +28,32 @@ export class JenkinsGroupService {
     return this.http.get(url, {search: params})
       .toPromise()
       .then(response => response.json() as JenkinsGroup[])
+      .catch(this.handleError);
+  }
+
+  createJenkinsGroup(group: JenkinsGroup): Promise<JenkinsGroup> {
+    const url = `${this.jenkinsGroupUrl}`;
+
+    return this.http.post(url, group, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as JenkinsGroup)
+      .catch(this.handleError)
+  }
+
+  updateJenkinsGroup(id:number, group: JenkinsGroup): Promise<JenkinsGroup> {
+    const url = `${this.jenkinsGroupUrl}/${id}`;
+
+    return this.http.put(url, group, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as JenkinsGroup)
+      .catch(this.handleError);
+  }
+
+  deleteJenkinsGroup(id: number): Promise<string> {
+    const url = `${this.jenkinsGroupUrl}/${id}`;
+    return this.http.delete(url, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as string)
       .catch(this.handleError);
   }
 

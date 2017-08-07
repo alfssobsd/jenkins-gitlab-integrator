@@ -6,6 +6,7 @@ from functools import partial
 from aiohttp import web
 from server.core.common import LoggingMixin
 from server.core.models.delayed_tasks import DelayedTaskStatus
+from server.core.models.jenkins_groups import JenkinsGroup
 from server.core.json_encoders import CustomJSONEncoder
 from server.core.security.policy import require_permission, Permission
 from . import set_log_marker, create_delayed_manager, create_jenkins_group_manager
@@ -124,16 +125,34 @@ class AdminApiV1JenkinsGroupView(web.View, LoggingMixin):
     @create_jenkins_group_manager
     @require_permission(Permission.ADMIN_UI)
     async def post(self):
-        pass
+        json_data = await self.request.json()
+        self._logging_debug(json_data)
+        obj = JenkinsGroup()
+        obj.name = json_data['name']
+        obj.jobs_base_path = json_data['jobs_base_path']
+        group = await self.jenkins_group_manager.create(obj)
+
+        return web.json_response(group, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
     @set_log_marker
     @create_jenkins_group_manager
     @require_permission(Permission.ADMIN_UI)
     async def put(self):
-        pass
+        json_data = await self.request.json()
+        self._logging_debug(json_data)
+        obj = JenkinsGroup()
+        obj.id = self.request.match_info['id']
+        obj.name = json_data['name']
+        obj.jobs_base_path = json_data['jobs_base_path']
+
+        await self.jenkins_group_manager.update(obj)
+
+        group = await self.jenkins_group_manager.get(obj.id)
+        return web.json_response(group, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
     @set_log_marker
     @create_jenkins_group_manager
     @require_permission(Permission.ADMIN_UI)
     async def delete(self):
-        pass
+        group = await self.jenkins_group_manager.delete(self.request.match_info['id'])
+        return web.json_response({})
