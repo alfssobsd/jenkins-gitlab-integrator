@@ -7,7 +7,7 @@ import { Stat } from '../models/stat'
 @Injectable()
 export class StatsService {
   private headers = new Headers({'Content-Type': 'application/json'});
-  private configUrl = '/stats';
+  private configUrl = '/api/v1/stats';
 
   constructor(private http: Http) {}
 

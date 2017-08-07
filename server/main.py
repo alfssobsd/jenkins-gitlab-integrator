@@ -5,8 +5,6 @@ import sys
 import base64
 import asyncio
 import pymysql
-import jinja2
-import aiohttp_jinja2
 import sqlalchemy as sa
 from aiohttp import web
 from aiohttp_session import setup as setup_session
@@ -20,7 +18,7 @@ import server.middlewares as middlewares
 from server.utils import TRAFARET
 from .core.views.debug import DebugView
 from .core.views.gitlab import GitLabWebhookView
-from .core.views.common import LoginView, LogOutView, IndexView, StatsView
+from .core.views.common import LoginApiV1View, IndexUIView, IndexView, StatsView
 from .core.views.admin_api import AdminApiV1ConfigView, AdminApiV1DelayedTasksView,\
  AdminApiV1DelayedTaskDetailView, AdminApiV1DelayedTaskChangeStatusView, AdminApiV1JenkinsGroupView, \
  AdminApiV1JenkinsGroupSearchView
@@ -33,29 +31,19 @@ class SecurityMixnin(object):
         setup_session(self.app, EncryptedCookieStorage(secret_key))
         setup_security(self.app, SessionIdentityPolicy(), FileAuthorizationPolicy(self.app['config']['users']))
 
-class JinjaMixin(object):
-    TEMPLATES_ROOT = pathlib.Path(__file__).parent / 'templates'
-
-    async def jinja_version_processor(self, request):
-        return {'app_version': request.app['app_version'] }
-
-    def setup_jinja(self):
-
-        aiohttp_jinja2.setup(self.app,
-                            context_processors=[self.jinja_version_processor,
-                                                aiohttp_jinja2.request_processor],
-                            loader=jinja2.FileSystemLoader(str(self.TEMPLATES_ROOT)))
-
 class RoutesMixin(object):
 
     PROJECT_ROOT = pathlib.Path(__file__).parent
 
     def setup_routes(self):
         self.app['PROJECT_ROOT'] = self.PROJECT_ROOT
-        self.app.router.add_get('/stats', StatsView, name='stats')
-        #self.app.router.add_get('/login', LoginView, name='login')
-        #self.app.router.add_post('/login', LoginView, name='login_post')
-        #self.app.router.add_get('/logout', LogOutView, name='logout')
+        self.app.router.add_get('/', IndexView, name='index')
+        self.app.router.add_get('/ui/', IndexUIView, name='index_ui_root')
+        self.app.router.add_get('/ui/{path:.*}', IndexUIView, name='index_ui')
+        self.app.router.add_get('/api/v1/stats', StatsView, name='api_v1_stats')
+        self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
+        self.app.router.add_post('/api/v1/login', LoginApiV1View, name='api_v1_login')
+        self.app.router.add_delete('/api/v1/logout', LoginApiV1View, name='api_v1_logout')
         #Config
         self.app.router.add_get('/admin/api/v1/config', AdminApiV1ConfigView, name='admin_api_v1_config')
         #DelayedTask
@@ -73,8 +61,7 @@ class RoutesMixin(object):
         self.app.router.add_post('/debug/post/webhook', DebugView)
         self.app.router.add_get('/debug/get/webhook', DebugView)
         self.app.router.add_post('/gitlab/group/{group}/job/{job_name}', GitLabWebhookView)
-        self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
-        self.app.router.add_get('/ui/{path:.*}', IndexView, name='index')
+
 
 class CommandLineOptionsMixin(object):
     def read_cmdline(self, argv):
@@ -146,7 +133,7 @@ class LoggerSetupMixin(object):
         logging.basicConfig(level=level, format='%(asctime)s:%(levelname)s:%(message)s')
 
 
-class Server(JinjaMixin, RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin,
+class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin,
     DBTablesMixin, LoggerSetupMixin, BackgroundWorkerMixin, SecurityMixnin):
     """
     Server entrypoint
@@ -157,7 +144,6 @@ class Server(JinjaMixin, RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBCo
         self.app = web.Application(loop=asyncio.get_event_loop())
         self.read_config(self.read_cmdline(argv))
         self.setup_root_logger()
-        self.setup_jinja()
         self.setup_security()
         self.setup_routes()
         self.init_sa_tables()

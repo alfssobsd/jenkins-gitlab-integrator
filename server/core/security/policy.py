@@ -112,21 +112,21 @@ async def is_authenticated(request):
     """
     return (await check_permission(request, Permission.ONLY_AUTH))
 
-async def logout_and_redirect(request):
+async def logout(request):
     """
-        Logout and redirect to index page
+        Logout user
 
         Args:
             request - aiohttp request
 
         Return:
-            response - aiohttp response
+            True or exceptions
     """
     index_url = request.app.router['index'].url()
     response = web.HTTPFound(index_url)
     if (await is_authenticated(request)):
         await aiohttp_security.forget(request, response)
-    return response
+    return True
 
 
 def auth_by_gitlab_token(func):

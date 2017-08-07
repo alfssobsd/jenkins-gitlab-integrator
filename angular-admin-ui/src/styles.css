@@ -28,8 +28,10 @@ body {
 }
 
 /* navbar */
-.navbar-brand {
-  color: #fff;
+.navbar-brand,
+.navbar-brand:hover,
+.navbar-brand:focus {
+color: #fff;
 }
 
 .navbar-nav > li > a {

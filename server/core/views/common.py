@@ -1,51 +1,21 @@
 import asyncio
-import aiohttp_jinja2
 import aiohttp_security
 from aiohttp import web
 from server.core.common import LoggingMixin
 from server.core.models.delayed_tasks import DelayedTaskStatus
-from server.core.security.policy import logout_and_redirect, is_authenticated, check_credentials, require_permission, Permission
+from server.core.security.policy import logout, is_authenticated, check_credentials, require_permission, Permission
 from . import set_log_marker, create_delayed_manager
 
-class LoginView(web.View, LoggingMixin):
-    """
-        View for login
-    """
-    @aiohttp_jinja2.template('login.html.j2')
-    async def get(self):
-        self._marker = self.request.marker
-        admin_url = self.request.app.router['admin_index'].url()
-        is_auth = await is_authenticated(self.request)
-        if is_auth:
-            response = web.HTTPFound(admin_url)
-            return response
-        return {}
-
-    @aiohttp_jinja2.template('login.html.j2')
-    async def post(self):
-        admin_url = self.request.app.router['admin_index'].url()
-        response = web.HTTPFound(admin_url)
-        self._marker = self.request.marker
-        post_data = await  self.request.post()
-        username = post_data['username']
-        password = post_data['password']
-        success_auth, username = await check_credentials(self.request.app['config']['users'],
-                                                        username=username,
-                                                        password=password)
-        if success_auth:
-            await aiohttp_security.remember(self.request, response, username)
-            return response
-
-        return {'message': 'Incorrect username or password'}
-
-class LogOutView(web.View, LoggingMixin):
-    """
-        View for logout
-    """
-    async def get(self):
-        return (await logout_and_redirect(self.request))
-
 class IndexView(web.View, LoggingMixin):
+    """
+        Redirect to UI
+    """
+    async def get(self):
+        ui_url = self.request.app.router['index_ui_root'].url()
+        response = web.HTTPFound(ui_url)
+        return response
+
+class IndexUIView(web.View, LoggingMixin):
     """
         index.html
     """
@@ -65,3 +35,28 @@ class StatsView(web.View, LoggingMixin):
                   'task_in_queue': len(tasks),
                   'app_version': self.request.app['app_version'] }
         return web.json_response(stats)
+
+class LoginApiV1View(web.View, LoggingMixin):
+    """
+        Login & LogOut API
+    """
+    @set_log_marker
+    async def post(self):
+        json_data = await  self.request.json()
+        username = json_data['username']
+        password = json_data['password']
+        success_auth, username = await check_credentials(self.request.app['config']['users'],
+                                                        username=username,
+                                                        password=password)
+        ui_url = self.request.app.router['index_ui_root'].url()
+        response = web.HTTPFound(ui_url)
+        if success_auth:
+            await aiohttp_security.remember(self.request, response, username)
+            return web.json_response({ 'username': username })
+
+        return web.json_response({'message': 'Incorrect username or password' }, status=401)
+
+    @set_log_marker
+    async def delete(self):
+        await logout(self.request)
+        return web.json_response({'message': 'logout'})

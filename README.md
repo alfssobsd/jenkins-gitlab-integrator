@@ -199,7 +199,7 @@ Go to http://server:port/login
 
 ### <a name="usage_stats"></a> App stats
 
-`http://server:port/stats` return json with stats.
+`http://server:port/api/v1/stats` return json with stats.
 
 ```
 {
