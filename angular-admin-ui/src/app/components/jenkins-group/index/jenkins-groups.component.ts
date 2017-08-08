@@ -38,9 +38,11 @@ export class JenkinsGroupsComponent implements OnInit {
   }
 
   delete(group: JenkinsGroup) {
-    this.jenkinsGroupService.deleteJenkinsGroup(group.id)
+    if(confirm("Are you sure to delete group "+group.name)) {
+      this.jenkinsGroupService.deleteJenkinsGroup(group.id)
       .then(() => {
         this.jenkinsGroupList = this.jenkinsGroupList.filter(g => g !== group);
       });
+    }
   }
 }

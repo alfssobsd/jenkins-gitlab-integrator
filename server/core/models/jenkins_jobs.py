@@ -57,7 +57,7 @@ class JenkinsJobManager(LoggingMixin):
             q = self._jenkins_jobs.select().\
                 where(columns.jenkins_group_id == group_id).\
                 order_by(columns.id)
-            
+
             self._logging_debug(q)
 
             result = await conn.execute(q)
@@ -142,8 +142,10 @@ class JenkinsJobManager(LoggingMixin):
                     update(self._jenkins_jobs.c.id == jenkins_job.id). \
                     values(jenkins_job.values)
                 self._logging_debug(q)
-                await conn.execute(q)
+                result = await conn.execute(q)
                 await trans.commit()
+                self._logging_debug('Commit')
+                return await self.get(jenkins_job.id)
             except Exception as e:
                 self._logging_debug('Rollback')
                 await trans.rollback()

@@ -19,15 +19,57 @@
       </div>
     </section>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <section class="box">
       <header>
         <h2 class="title pull-left">jobs in group</h2>
       </header>
       <div class="content-body">
-        <ul *ngFor="let job of jenkinsJobList">
-          <li>#{{ job.id }} {{ job.name }} / {{ job.gitlab_project_id}} / {{ job.jenkins_job_perent_id}}</li>
-        </ul>
+        <form class="form-inline" *ngIf="selectJenkinsJob" (ngSubmit)="f.form.valid && saveJob()" #f="ngForm">
+          <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !name.valid }">
+            <input [(ngModel)]="selectJenkinsJob.name" [ngModelOptions]="{standalone: true}" #name="ngModel" class="form-control" placeholder="name" required>
+          </div>
+          <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !gitLabProjectId.valid }">
+            <input [(ngModel)]="selectJenkinsJob.gitlab_project_id" [ngModelOptions]="{standalone: true}" #gitLabProjectId="ngModel" class="form-control" placeholder="gitlab_project_id" required>
+          </div>
+          <div class="form-group">
+            <select  [(ngModel)]="selectJenkinsJob.jenkins_job_perent_id" [ngModelOptions]="{standalone: true}" class="form-control">
+              <option [ngValue]="null"></option>
+              <option *ngFor="let job of jenkinsJobList" [ngValue]="job.id">{{job.name}}</option>
+            </select>
+          </div>
+          <button class="btn btn-default">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+          </button>
+        </form>
+        <hr>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>name</th>
+              <th>gitlab_project_id</th>
+              <th>jenkins_job_perent_id</th>
+              <th>actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let job of jenkinsJobList">
+              <td>
+                <a (click)="editJob(job)"  href="javascript:void(0)">
+                  #{{job.id}}
+                </a>
+              </td>
+              <td>{{job.name}}</td>
+              <td>{{job.gitlab_project_id}}</td>
+              <td>{{job.jenkins_job_perent_id}}</td>
+              <td>
+                <a (click)="editJob(job)"  href="javascript:void(0)"> Edit </a>
+                <a (click)="deleteJob(job)" href="javascript:void(0)" > Delete </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </div>

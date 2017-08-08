@@ -7,16 +7,44 @@ import { JenkinsJob } from '../models/jenkins-job'
 @Injectable()
 export class JenkinsJobService {
   private headers = new Headers({'Content-Type': 'application/json'});
-  private jenkinsJobUrl = '/api/admin/v1/jenkins-job';
+  private jenkinsGroupUrl = '/api/admin/v1/jenkins-group';
+  private jenkinsJobPartUrl = 'jenkins-job';
 
   constructor(private http: Http) {}
 
   getJenkinsJobs(groupId: number): Promise<JenkinsJob[]> {
-    const url = `${this.jenkinsJobUrl}/${groupId}`;
+    const url = `${this.jenkinsGroupUrl}/${groupId}/${this.jenkinsJobPartUrl}`;
 
     return this.http.get(url)
       .toPromise()
       .then(response => response.json() as JenkinsJob[])
+      .catch(this.handleError);
+  }
+
+  createJenkinsJob(job: JenkinsJob): Promise<JenkinsJob> {
+    const url = `${this.jenkinsGroupUrl}/${job.jenkins_group_id}/${this.jenkinsJobPartUrl}`;
+
+    return this.http.post(url, job, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as JenkinsJob)
+      .catch(this.handleError)
+  }
+
+  updateJenkinsJob(job: JenkinsJob): Promise<JenkinsJob> {
+    const url = `${this.jenkinsGroupUrl}/${job.jenkins_group_id}/${this.jenkinsJobPartUrl}/${job.id}`;
+
+    return this.http.put(url, job, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as JenkinsJob)
+      .catch(this.handleError);
+  }
+
+  deleteJenkinsJob(job: JenkinsJob): Promise<string> {
+    const url = `${this.jenkinsGroupUrl}/${job.jenkins_group_id}/${this.jenkinsJobPartUrl}/${job.id}`;
+
+    return this.http.delete(url, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as string)
       .catch(this.handleError);
   }
 
