@@ -2,6 +2,8 @@ from aiohttp.client_exceptions import ClientResponseError, ClientConnectorError
 
 from server.core.common import LoggingMixin
 from server.core.clients.gitlab_client import GitLabPush
+from server.core.models.jenkins_groups import JenkinsGroupManager
+from server.core.models.jenkins_jobs import JenkinsJobManager
 from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTask, RecordNotFound
 from server.core.clients.jenkins_client import JenkinsClient
 
@@ -33,7 +35,10 @@ class GitLabPushService(LoggingMixin):
                                              jenkins_config['user_id'],
                                              jenkins_config['api_token'],
                                              loop=self._loop)
+
         self._delayed_task_manager = DelayedTaskManager(self._marker, db, db_tables)
+        self._jenkins_group_manager = JenkinsGroupManager(self._marker, db, db_tables)
+        self._jenkins_job_manager = JenkinsJobManager(self._marker, db, db_tables)
 
     async def exec_raw(self, group, job_name, gitlab_push_raw_data):
         """
