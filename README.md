@@ -51,6 +51,7 @@ config:
 host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
+server_url: http://gitlab.example.local:8000 #server url for hooks (need for auto create webhooks)
 
 #before usage you need generate secret key
 #from cryptography.fernet import Fernet
@@ -194,7 +195,7 @@ Admin UI provide:
  * show current config & version
 
 ```
-Go to http://server:port/login
+Go to http://server:port/
 ```
 
 ### <a name="usage_stats"></a> App stats
@@ -229,6 +230,12 @@ create database jenkins_integrator DEFAULT CHARACTER SET utf8;
 
 vim alembic.ini
 alembic -c config/alembic.ini upgrade head
+```
+
+### Build UI
+```
+cd angular-admin-ui
+ng build -d /static/
 ```
 
 ### Run server
