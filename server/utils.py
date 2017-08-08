@@ -33,6 +33,7 @@ TRAFARET = T.Dict({
             'api_token': T.String(),
             'groups': T.Any(),
             }),
+    T.Key('server_url'): T.String(),
     T.Key('log_level'): T.String(),
     T.Key('host'): T.String(),
     T.Key('port'): T.Int(),

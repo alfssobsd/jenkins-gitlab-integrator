@@ -1,6 +1,7 @@
 host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
+server_url: http://gitlab.example.local:8000 #server url for hooks (need for auto create webhooks)
 
 #generate secret
 #from cryptography.fernet import Fernet
