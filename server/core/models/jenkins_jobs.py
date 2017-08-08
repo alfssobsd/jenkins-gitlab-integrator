@@ -29,6 +29,53 @@ class JenkinsJob(object):
 
         return obj
 
+    def __repr__(self):
+        msg = "JenkinsJob %s" % (self.values)
+        return msg
+
+class JenkinsJobPathFinder(object):
+    """" Class for search jobs path """
+
+    def __init__(self, jobs):
+        self.jobs = jobs
+
+    def get_all_paths(self):
+        graph = self._prepare_graph(self.jobs)
+        paths = list()
+        for job in graph[None]:
+            paths += list(self._paths(graph, job))
+        return paths
+
+    def _prepare_graph(self, jobs):
+        """ Convert job list to graph """
+
+        graph = dict()
+        for job in jobs:
+            if not job.id in graph:
+                graph[job.id] = list()
+            if not job.jenkins_job_perent_id in graph:
+                graph[job.jenkins_job_perent_id] = list()
+            graph[job.jenkins_job_perent_id].append(job)
+        return graph
+
+    def _paths(self, graph, job):
+        """ Generate the maximal cycle-free paths in graph starting at job """
+
+        path = [job]
+        seen = {job.id}
+        def search():
+            dead_end = True
+            for neighbour_job in graph[path[-1].id]:
+                if neighbour_job.id not in seen:
+                    dead_end = False
+                    seen.add(neighbour_job.id)
+                    path.append(neighbour_job)
+                    yield from search()
+                    path.pop()
+                    seen.remove(neighbour_job.id)
+            if dead_end:
+                yield list(path)
+        yield from search()
 
 class JenkinsJobManager(LoggingMixin):
     """ Class for managment data in jenkins_jobs table"""

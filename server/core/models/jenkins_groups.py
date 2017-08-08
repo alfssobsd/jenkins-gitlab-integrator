@@ -27,6 +27,9 @@ class JenkinsGroup(object):
         obj.jobs_base_path = jobs_base_path
         return obj
 
+    def __repr__(self):
+        msg = "JenkinsGroup %s" % (self.values)
+        return msg
 
 class JenkinsGroupManager(LoggingMixin):
     """ Class for managment data in jenkins_groups table"""
