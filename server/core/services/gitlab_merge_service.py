@@ -2,7 +2,7 @@ from aiohttp.client_exceptions import ClientResponseError, ClientConnectorError
 
 from server.core.common import LoggingMixin
 from server.core.models.jenkins_groups import JenkinsGroupManager
-from server.core.models.jenkins_jobs import JenkinsJobManager
+from server.core.models.jenkins_jobs import JenkinsJobManager, JenkinsJobPathFinder
 from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTaskStatus, DelayedTask, RecordNotFound
 from server.core.clients.jenkins_client import JenkinsClient
 from server.core.clients.gitlab_client import GitLabClient, GitLabMergeState, GitLabMerge
@@ -128,24 +128,33 @@ class GitLabMergeService(LoggingMixin):
         prev_build_info = None
         # check build flow
         try:
-            for chain in self._get_chains_from_group(delayed_task.group):
-                for job_name in self._get_jobs_from_chains(delayed_task.group, chain):
+            jenkins_group = await self._jenkins_group_manager.find_by_name(delayed_task.group)
+            jenkins_jobs = await self._jenkins_job_manager.find_by_group_id(jenkins_group.id)
+            job_path_finder = JenkinsJobPathFinder(jenkins_jobs)
+            jenkins_jobs_first = await self._jenkins_job_manager.find_first_by_group_id(jenkins_group.id)
+
+            paths = job_path_finder.get_all_paths()
+            self._logging_debug(paths)
+
+            for path in paths:
+                for job in path:
                     repo_remote_url = None
 
-                    # if set repo for job_name from merge
-                    if delayed_task.job_name == job_name:
+                    # if set repo job_name eq current job var, set repo_remote_url
+                    # for search build sha1
+                    if delayed_task.job_name == job.name:
                         repo_remote_url = ssh_url_to_repo
 
                     # get info about last succes build
                     build_info = await self._jenkins_client.get_last_success_build(
-                        self._jenkins_base_path(delayed_task.group),
-                        job_name,
+                        jenkins_group.jobs_base_path,
+                        job.name,
                         delayed_task.branch,
                         repo_remote_url)
                     self._logging_debug(build_info)
 
                     # failure build if sha1 from mege does not match
-                    if delayed_task.job_name == job_name:
+                    if delayed_task.job_name == job.name:
                         if not build_info.sha1 == delayed_task.sha1:
                             return False
 
@@ -249,27 +258,3 @@ class GitLabMergeService(LoggingMixin):
             pass
         except Exception as e:
             self._logging_error(e)
-
-    def _get_chains_from_group(self, group):
-        """
-        Get chains from group
-        """
-        return self._jenkins_config['groups'][group]['chains'].keys()
-
-    def _get_jobs_from_chains(self, group, chain):
-        """
-        Get jobs from  chains
-        """
-        return self._jenkins_config['groups'][group]['chains'][chain]
-
-    def _get_first_job_from_group(self, group):
-        """
-        Get first job from jenkins group
-        """
-        return self._jenkins_config['groups'][group]['first_job']
-
-    def _jenkins_base_path(self, group):
-        """
-        Get jobs_base_path from jenkins group
-        """
-        return self._jenkins_config['groups'][group]['jobs_base_path']

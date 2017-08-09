@@ -40,6 +40,17 @@ class JenkinsJobPathFinder(object):
         self.jobs = jobs
 
     def get_all_paths(self):
+        """
+        Return all find paths for run
+
+        Args:
+            None
+        Return:
+            [
+                [JenkinsJob, JenkinsJob, JenkinsJob],
+                [JenkinsJob, JenkinsJob, JenkinsJob],
+            ]
+        """
         graph = self._prepare_graph(self.jobs)
         paths = list()
         for job in graph[None]:
