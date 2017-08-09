@@ -1,6 +1,6 @@
 import enum
 import hashlib
-import json
+
 from sqlalchemy import desc
 
 from server.core.common import LoggingMixin
@@ -23,6 +23,7 @@ class DelayedTask(object):
 
     def __init__(self):
         self.id = None
+        self.sha1 = None
         self._task_status = DelayedTaskStatus.NEW
         self._task_type = DelayedTaskType.GITLAB_PUSH
         self.group = None
@@ -430,6 +431,32 @@ class DelayedTaskManager(LoggingMixin):
                 and anower from sqlalchemy
         """
         await self.set_status(delayed_task_id, DelayedTaskStatus.CANCELED)
+
+    async def delete(self, delayed_task_id):
+        """
+        Delete row
+
+        Args:
+            delayed_task_id - DelayedTask id
+
+        Return:
+            None
+
+        Exceptions:
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            trans = await conn.begin()
+            try:
+                q = self._delayed_tasks.delete(self._delayed_tasks.c.id == delayed_task_id)
+                self._logging_debug(q)
+                await conn.execute(q)
+                await trans.commit()
+            except Exception as e:
+                self._logging_debug('Rollback')
+                await trans.rollback()
+                raise
 
     # private methods
     def _columns(self):
