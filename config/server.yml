@@ -47,19 +47,3 @@ workers:
 jenkins: #settings for jenkins
   user_id: sergei.kravchuk #jenkins user
   api_token: 2342b01c03caaa0465d144e310893ba9 # jenkins api token
-  groups: # groups jobs
-    testproject: # name of group
-      jobs_base_path: https://jenkins.example.local/job/experments #base job path for group
-      first_job: testproject #first job for run
-      chains: #chains of jobs
-        default: #chain name
-          - testproject #job in chain
-          - testprojectendstep
-    test2:
-      jobs_base_path: https://jenkins.example.local/job/test2
-      first_job: test
-      chains:
-        default:
-          - test
-          - test2
-

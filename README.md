@@ -14,7 +14,7 @@ Menu:
   * [Install requirements libs](#usage_install_libs)
   * [Configure database schema](#usage_config_db)
   * [Configure server](#usage_config_server)
-  * [Example group config](#usage_example_group)
+  * [Configure integration with GitLab (webhooks)](#usage_gitlab_integration)
   * [Example Gitlab webhook](#usage_gitlab_webhook)
   * [Exec server](#usage_exec_server)
   * [Admin UI](#usage_admin_ui)
@@ -98,70 +98,19 @@ workers:
 jenkins: #settings for jenkins
   user_id: sergey.kravchuk #jenkins user
   api_token: 2342b01c0dceca0465d144e310893ba9 # jenkins api token
-  groups: # groups jobs
-    testproject: # name of group
-      jobs_base_path: https://jenkins.example.local/job/experments #base job path for group
-      first_job: testproject #first job for run
-      chains: #chains of jobs
-        default: #chain name
-          - testproject #job in chain
-          - testprojectendstep
-    test2:
-      jobs_base_path: https://jenkins.example.local/job/test2
-      first_job: test
-      chains:
-        default:
-          - test
-          - test2
 ```
 
-### <a name="usage_example_group"></a> Example group config
+### <a name="usage_gitlab_integration"></a> Configure integration with GitLab (webhooks)
+
+All flows in jenkins combined in groups. if all `jobs` in group is success, `merge` will be marked is as successful
+
+Examples wokring flows:
 
 ![simple build (pipeline multibranch)](docs/images/jenkins-integrator-config-simple.png)
-```
-  groups:
-    test:
-      jobs_base_path: https://jenkins.example.local/job/test
-      first_job: t1
-      chains:
-        default:
-          - t1
-          - t2
-          - t3
-```
-
-gitlab webhook `http://server:port/gitlab/group/test/job/t1` or
-
-`http://server:port/gitlab/group/test/job/t2` or
-
-`http://server:port/gitlab/group/test/job/t3`
-
-
 ![star build (pipeline multibranch)](docs/images/jenkins-integrator-config-star.png)
-```
-  groups:
-    appd:
-      jobs_base_path: https://jenkins.example.local/job/appd
-      first_job: t1
-      chains:
-        d1:
-          - t1
-          - t2
-          - t3
-          - d1
-        d2:
-          - t1
-          - t2
-          - t3
-          - d2
-        d3:
-          - t1
-          - t2
-          - t3
-          - d3
-```
 
-gitlab webhook `http://server:port/gitlab/group/appd/job/{job_name}`
+Go to http://server:port/ui/jenkins-groups for configure.
+
 
 ### <a name="usage_gitlab_webhook"></a> Example Gitlab webhook
 
@@ -193,6 +142,7 @@ Or you can make docker image with your config in /opt/app/config
 Admin UI provide:
  * management for delayed tasks
  * show current config & version
+ * manage jenkins groups (webhooks)
 
 ```
 Go to http://server:port/

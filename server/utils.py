@@ -31,7 +31,6 @@ TRAFARET = T.Dict({
         T.Dict({
             'user_id': T.String(),
             'api_token': T.String(),
-            'groups': T.Any(),
             }),
     T.Key('server_url'): T.String(),
     T.Key('log_level'): T.String(),
