@@ -14,7 +14,6 @@ class GitLabWebhookView(web.View, LoggingMixin):
 
     @auth_by_gitlab_token
     @set_log_marker
-    @require_permission(Permission.GITLAB_HOOKS)
     async def post(self):
         request = self.request
         group = request.match_info['group']

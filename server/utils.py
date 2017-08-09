@@ -32,6 +32,7 @@ TRAFARET = T.Dict({
             'user_id': T.String(),
             'api_token': T.String(),
             }),
+    T.Key('gitlab_webhook_token'): T.String(),
     T.Key('server_url'): T.String(),
     T.Key('log_level'): T.String(),
     T.Key('host'): T.String(),

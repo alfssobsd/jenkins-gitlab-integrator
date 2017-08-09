@@ -10,8 +10,7 @@ class Permission(enum.Enum):
         App permissions
     """
     ONLY_AUTH = 0  # only auth user
-    GITLAB_HOOKS = 1  # can use gitlab hooks
-    ADMIN_UI = 2  # can user admin ui
+    ADMIN_UI = 1  # can user admin ui
 
 
 class FileAuthorizationPolicy(AbstractAuthorizationPolicy):
@@ -59,12 +58,6 @@ class FileAuthorizationPolicy(AbstractAuthorizationPolicy):
                 if Permission[permission] == Permission.ONLY_AUTH:
                     return True
 
-                try:
-                    if user['superuser']:
-                        return True
-                except KeyError:
-                    pass
-
                 for cur_user_permission in user['permission']:
                     try:
                         print(cur_user_permission)
@@ -75,7 +68,7 @@ class FileAuthorizationPolicy(AbstractAuthorizationPolicy):
         return False
 
 
-async def check_credentials(users, username=None, password=None, token=None):
+async def check_credentials(users, username=None, password=None):
     """
         Check user credentials
 
@@ -83,7 +76,6 @@ async def check_credentials(users, username=None, password=None, token=None):
             users - users list
             username - username
             passwordd - password
-            token - user token
 
         Return:
             True - correct credentials
@@ -91,9 +83,7 @@ async def check_credentials(users, username=None, password=None, token=None):
             False - incorrect credentials or user not exist
     """
     for user in users:
-        if user['username'] == username and user['password'] == password and token is None:
-            return True, user['username']
-        if token and user['token'] == token:
+        if user['username'] == username and user['password'] == password:
             return True, user['username']
     return False, None
 
@@ -143,14 +133,10 @@ def auth_by_gitlab_token(func):
     @wraps(func)
     async def wrapper(*args):
         request = args[0].request
-        users = request.app['config']['users']
         valid_token = False
         try:
-            auth_success, username = await check_credentials(users, token=request.headers['X-Gitlab-Token'])
-            if auth_success:
+            if request.app['config']['gitlab_webhook_token'] == request.headers['X-Gitlab-Token']:
                 valid_token = True
-                response = web.HTTPFound("/")
-                await aiohttp_security.remember(request, response, username)
         except KeyError:
             valid_token = False
         finally:

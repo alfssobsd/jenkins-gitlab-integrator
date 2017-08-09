@@ -51,28 +51,19 @@ config:
 host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
-server_url: http://gitlab.example.local:8000 #server url for hooks (need for auto create webhooks)
 
-#before usage you need generate secret key
+server_url: http://jenkins-gitlab-integrator.example.local:8000 #server url for gitlab webhooks (need for auto create webhooks)
+gitlab_webhook_token: adEleRYsiViB1_34 #token for auth gitlab webhooks (Secret Token, Private-Token header)
+
+#generate secret
 #from cryptography.fernet import Fernet
 #Fernet.generate_key()
-session_secret: N5I6xGINvJ6RigIwd_SX7nHM4J7zYc6ONx6MGH3F__o=
-
+session_secret: N5I6xGINvJ6RigIwd_SX7nHM4J7zYc6ONx6MGH3F__o= # salt for cookies
 #user list
 users:
   - username: root
     password: root
-    token: adEleRYsiViB
-    superuser: yes # Disable restrictions for this user
-
-  - username: gitlab_bot
-    password: gitlab_bot
-    token: adEleRYsiViB1_34 #token for api auth , gitlab Private-Token header !!! All token must be unique
-    permission: [GITLAB_HOOKS] # allow access to GITLAB_HOOKS
-
-  - username: admin
-    password: password
-    permission: [ADMIN_UI] # allow access to admin ui
+    permission: [ADMIN_UI]
 
 #mysql connection, same as alembic.ini
 mysql:
@@ -87,17 +78,17 @@ mysql:
 #gitlab api config
 gitlab:
   url: https://gitlab.example.local #gitlab url
-  access_token: xc3PXwfWxaKMdAM8yyzc #gitlab user api token (look to gitlab docs)
+  access_token: adEleRYsiViB #gitlab user api token (look to gitlab docs)
 
 #background workers config
 workers:
   enable: yes #enable or disable run workers
-  max_attempts: 10000 # how many try for do task
+  max_attempts: 1400 # how many try for do task
   scan_timeout: 60 # period between task run
 
 jenkins: #settings for jenkins
-  user_id: sergey.kravchuk #jenkins user
-  api_token: 2342b01c0dceca0465d144e310893ba9 # jenkins api token
+  user_id: sergei.kravchuk #jenkins user
+  api_token: 2342b01c03caaa0465d144e310893ba9 # jenkins api token
 ```
 
 ### <a name="usage_gitlab_integration"></a> Configure integration with GitLab (webhooks)

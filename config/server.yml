@@ -2,6 +2,7 @@ host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
 server_url: http://gitlab.example.local:8000 #server url for hooks (need for auto create webhooks)
+gitlab_webhook_token: adEleRYsiViB1_34 #token for auth gitlab webhooks (Secret Token, Private-Token header)
 
 #generate secret
 #from cryptography.fernet import Fernet
@@ -11,17 +12,7 @@ session_secret: N5I6xGINvJ6RigIwd_SX7nHM4J7zYc6ONx6MGH3F__o= # salt for cookies
 users:
   - username: root
     password: root
-    token: adEleRYsiViB
-    superuser: yes # Disable restrictions for this user
-
-  - username: gitlab_bot
-    password: gitlab_bot
-    token: adEleRYsiViB1_34 #token for api auth , gitlab Private-Token header !!! All token must be unique
-    permission: [GITLAB_HOOKS] # allow access to GITLAB_HOOKS
-
-  - username: admin
-    password: password
-    permission: [ADMIN_UI] # allow access to admin ui
+    permission: [ADMIN_UI]
 
 #mysql connection, same as alembic.ini
 mysql:
