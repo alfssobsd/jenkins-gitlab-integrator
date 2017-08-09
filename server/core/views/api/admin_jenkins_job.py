@@ -20,7 +20,7 @@ class AdminApiV1JenkinsJobListView(web.View, LoggingMixin):
     @require_permission(Permission.ADMIN_UI)
     async def get(self):
         group_id = self.request.match_info['group_id']
-        jobs = await self.jenkins_job_manager.find_by_groud_id(int(group_id))
+        jobs = await self.jenkins_job_manager.find_by_group_id(int(group_id))
         return web.json_response(jobs, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
 

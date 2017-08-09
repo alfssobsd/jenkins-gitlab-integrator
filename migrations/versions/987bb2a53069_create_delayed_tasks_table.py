@@ -35,4 +35,5 @@ def upgrade():
     op.create_index('delayed_tasks_unq_index', 'delayed_tasks', ['uniq_md5sum'], unique=True)
 
 def downgrade():
+    op.drop_index('delayed_tasks_unq_index')
     op.drop_table('delayed_tasks')

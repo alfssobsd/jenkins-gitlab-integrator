@@ -85,32 +85,60 @@ class JenkinsJobManager(LoggingMixin):
         self.db_pool = db_pool
         self._jenkins_jobs = tables['jenkins_jobs']
 
-    async def find_by_groud_id(self, group_id):
+    async def find_by_group_id(self, jenkins_group_id):
         """
-        Search jenkins_groups by group_id
+        Search JenkinsJobs by jenkins_group_id
 
         Args:
-            group_id - group id
+            jenkins_group_id - jenkins_group id
         Return:
-            list[JenkinsGroup obj, JenkinsGroup obj]
+            list[JenkinsJob obj, JenkinsJob obj]
 
         Exceptions:
                 pymysql.err
         """
-        self._logging_debug("Find by group id: %d" % group_id)
+        self._logging_debug("Find by jenkins_group_id: %d" % jenkins_group_id)
 
         columns = self._jenkins_jobs.c
         async with self.db_pool.acquire() as conn:
             q = self._jenkins_jobs.select().\
-                where(columns.jenkins_group_id == group_id).\
+                where(columns.jenkins_group_id == jenkins_group_id).\
                 order_by(columns.id)
-
             self._logging_debug(q)
-
             result = await conn.execute(q)
             rows = await result.fetchall()
             list_data_obj = await self._mapping_from_tuple(rows)
             return list_data_obj
+
+    async def find_first_by_group_id(self, jenkins_group_id):
+        """
+        Find JenkinsJob by jenkins_group_id
+
+        Args:
+            jenkins_group_id - jenkins_group id
+        Return:
+            JenkinsJob
+
+        Exceptions:
+                pymysql.err
+        """
+        self._logging_debug("Find first jenkins_job by jenkins_group_id: %d" % jenkins_group_id)
+
+        columns = self._jenkins_jobs.c
+        async with self.db_pool.acquire() as conn:
+            q = self._jenkins_jobs.select().\
+                where(columns.jenkins_group_id == jenkins_group_id).\
+                where(columns.jenkins_job_perent_id == None)
+            self._logging_debug(q)
+            result = await conn.execute(q)
+            #get first row
+            row = await result.fetchone()
+            if row is None:
+                msg = "JenkinsGroup with jenkins_group_id: {} does not exists"
+                raise RecordNotFound(msg.format(jenkins_group_id))
+            obj = await self._mapping_row_to_obj(row)
+            self._logging_debug(obj)
+            return obj
 
     async def get(self, job_id):
         """
@@ -131,9 +159,10 @@ class JenkinsJobManager(LoggingMixin):
             q = self._jenkins_jobs.select().where(self._jenkins_jobs.c.id == job_id)
             self._logging_debug(q)
             result = await conn.execute(q)
+            #get first row
             row = await result.fetchone()
             if row is None:
-                msg = "JenkinsGroup with id: {} does not exists"
+                msg = "JenkinsJob with id: {} does not exists"
                 raise RecordNotFound(msg.format(job_id))
             obj = await self._mapping_row_to_obj(row)
             self._logging_debug(obj)
@@ -141,7 +170,7 @@ class JenkinsJobManager(LoggingMixin):
 
     async def create(self, jenkins_job):
         """
-        Create JenkinsGroup object
+        Create JenkinsJob object
 
         Args:
             jenkins_job - JenkinsJob object
@@ -162,21 +191,22 @@ class JenkinsJobManager(LoggingMixin):
                 result = await conn.execute(q)
                 await trans.commit()
                 self._logging_debug('Commit')
-                return await self.get(result.lastrowid)
             except Exception as e:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
+
+            return await self.get(result.lastrowid)
 
     async def update(self, jenkins_job):
         """
         Update values
 
         Args:
-            jenkins_group - JenkinsJob
+            jenkins_job - JenkinsJob
 
         Return:
-            None
+            JenkinsJob
 
         Exceptions:
                 pymysql.err
@@ -192,11 +222,12 @@ class JenkinsJobManager(LoggingMixin):
                 result = await conn.execute(q)
                 await trans.commit()
                 self._logging_debug('Commit')
-                return await self.get(jenkins_job.id)
             except Exception as e:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
+
+            return await self.get(jenkins_job.id)
 
     async def delete(self, job_id):
         """

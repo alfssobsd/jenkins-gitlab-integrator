@@ -71,7 +71,7 @@ class JenkinsGroupManager(LoggingMixin):
             list_data_obj = await self._mapping_from_tuple(rows)
             return list_data_obj
 
-    async def find_by_name(name):
+    async def find_by_name(self, name):
         """
         Get one JenkinsGroup object by name
 
@@ -148,11 +148,12 @@ class JenkinsGroupManager(LoggingMixin):
                 result = await conn.execute(q)
                 await trans.commit()
                 self._logging_debug('Commit')
-                return await self.get(result.lastrowid)
             except Exception as e:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
+
+            return await self.get(result.lastrowid)
 
     async def update(self, jenkins_group):
         """
@@ -162,7 +163,7 @@ class JenkinsGroupManager(LoggingMixin):
             jenkins_group - JenkinsGroup
 
         Return:
-            None
+            JenkinsGroup
 
         Exceptions:
                 pymysql.err
@@ -181,6 +182,8 @@ class JenkinsGroupManager(LoggingMixin):
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
+
+            return await self.get(jenkins_group.id)
 
     async def delete(self, grop_id):
         """

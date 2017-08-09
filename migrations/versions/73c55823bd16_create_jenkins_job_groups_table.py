@@ -32,7 +32,11 @@ def upgrade():
         sa.Column('gitlab_project_id', sa.Integer, nullable=False)
     )
     op.create_index('jenkins_jobs_unq_index', 'jenkins_jobs', ['name', 'jenkins_group_id'], unique=True)
+    op.create_index('jenkins_jobs_group_idx', 'jenkins_jobs', ['jenkins_group_id'])
 
 def downgrade():
+    op.drop_idnex('jenkins_jobs_unq_index')
+    op.drop_idnex('jenkins_groups_unq_index')
+    op.drop_idnex('jenkins_jobs_group_idx')
     op.drop_table('jenkins_jobs')
     op.drop_table('jenkins_groups')
