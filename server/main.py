@@ -148,7 +148,7 @@ class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin
     """
     Server entrypoint
     """
-    SERVER_VERSION = "1.0.3"
+    SERVER_VERSION = "1.1.0"
 
     def __init__(self, argv):
         self.app = web.Application(loop=asyncio.get_event_loop())
