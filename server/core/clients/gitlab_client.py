@@ -3,6 +3,8 @@ import aiohttp
 from server.core.common import LoggingMixin
 
 _PROJECT_INFO = "%(base_url)s/api/v4/projects/%(project_id)d"
+_PROJECT_HOOKS = "%(base_url)s/api/v4/projects/%(project_id)d/hooks"
+_PROJECT_HOOK = "%(base_url)s/api/v4/projects/%(project_id)d/hooks/%(hook_id)d"
 _MERGE_REQUEST = "%(base_url)s/api/v4/projects/%(project_id)d/merge_requests/%(merge_id)d"
 _MERGE_REQUEST_COMMENTS = "%(base_url)s/api/v4/projects/%(project_id)d/merge_requests/%(merge_id)d/notes"
 _MERGE_REQUEST_COMMENT = "%(base_url)s/api/v4/projects/%(project_id)d/merge_requests/%(merge_id)d/notes/%(comment_id)d"
@@ -94,6 +96,38 @@ class GitLabPush(object):
         return gitlab_push_obj
 
 
+class GitLabWebHook(object):
+    """
+    Data class for webhook object (https://docs.gitlab.com/ce/api/projects.html#hooks)
+    """
+
+    def __init__(self):
+        self.id = None
+        self.url = None
+        self.push_events = True
+        self.merge_requests_events = True
+        self.token = None
+        self.enable_ssl_verification = False
+
+    @property
+    def values(self):
+        result = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        return result
+
+    def __repr__(self):
+        msg = "GitLabWebHook %s" % (self.values)
+        return msg
+
+    @staticmethod
+    def from_json(json_data):
+        obj = GitLabWebHook()
+        obj.id = json_data['id']
+        obj.url = json_data['url']
+        obj.url = json_data['push_events']
+        obj.url = json_data['merge_requests_events']
+        obj.url = json_data['enable_ssl_verification']
+
+
 class GitLabClient(LoggingMixin):
     """
         Async gitlab api client
@@ -111,6 +145,32 @@ class GitLabClient(LoggingMixin):
         self._base_url = base_url
         self._headers = {'PRIVATE-TOKEN': access_token}
         self._loop = loop
+
+    async def get_webhooks(self, project_id):
+        """
+        Get webhooks from project
+
+        Args:
+            project_id - project id in gitlab
+
+        Return:
+            [GitLabWebHook, GitLabWebHook, ...]
+
+        Exceptions:
+            aiohttp.client_exceptions.ClientResponseError - error response data
+            aiohttp.client_exceptions.ClientConnectorError - problem connect
+        """
+        url = self._api_url(_PROJECT_HOOKS, **{'base_url': self._base_url, 'project_id': project_id})
+        self._logging_info("url=%s" % url)
+
+        data, status = await self._get_request(url)
+        self._logging_info("status = %d" % status)
+
+        webhooks = list()
+        for item in data:
+            webhooks.append(GitLabWebHook.from_json(item))
+
+        return webhooks
 
     async def get_ssh_url_to_repo(self, project_id):
         """
@@ -156,6 +216,37 @@ class GitLabClient(LoggingMixin):
         self._logging_info("status = %d" % status)
 
         return GitLabMerge.from_api_json(data)
+
+    async def create_webhook(self, project_id, url, token):
+        """
+        Create project webhook
+
+        Args:
+            project_id - project id
+            url - url webhook
+            token - secret token for webhook
+
+        Return:
+            GitLabWebHook
+
+        Exceptions:
+            aiohttp.client_exceptions.ClientResponseError - no successful build or job not exist
+            aiohttp.client_exceptions.ClientConnectorError - problem connect
+        """
+
+
+        url = self._api_url(_PROJECT_HOOKS, **{'base_url': self._base_url, 'project_id': project_id})
+        self._logging_info("url=%s" % url)
+
+        obj = GitLabWebHook()
+        obj.url = url
+        obj.token = token
+        data, status = await self._post_request(url, obj.values)
+
+        self._logging_info("status = %d" % status)
+        self._logging_debug("create GitLabWebHook = %s" % GitLabWebHook.from_json(data))
+
+        return GitLabWebHook.from_json(data)
 
     async def create_merge_comment(self, project_id, merge_id, message):
         """
@@ -207,9 +298,32 @@ class GitLabClient(LoggingMixin):
         self._logging_debug("update merge comment = %s" % data)
         return data['id']
 
+    async def delete_webhook(self, project_id, hook_id):
+        """
+        Delete project webhook
+
+        Args:
+            project_id - project id
+            hook_id - hook id
+
+        Return:
+            raw data
+
+        Exceptions:
+            aiohttp.client_exceptions.ClientResponseError - no successful build or job not exist
+            aiohttp.client_exceptions.ClientConnectorError - problem connect
+        """
+        url = self._api_url(_PROJECT_HOOK, **{'base_url': self._base_url,
+            'project_id': project_id, 'hook_id': hook_id})
+        self._logging_info("url=%s" % url)
+        data, status = await self._delete_request(url, {})
+        self._logging_info("status = %d" % status)
+
+        return data
+
     async def _get_request(self, url):
         """
-        HTTP GET json
+        HTTP GET request
 
         Args:
             url
@@ -231,11 +345,11 @@ class GitLabClient(LoggingMixin):
 
     async def _post_request(self, url, data):
         """
-        HTTP POST json
+        HTTP POST request
 
         Args:
             url - url
-            data - send hash
+            data - send data
         Return:
             response data
             http code
@@ -255,11 +369,11 @@ class GitLabClient(LoggingMixin):
 
     async def _put_request(self, url, data):
         """
-        HTTP PUT json
+        HTTP PUT request
 
         Args:
             url - url
-            data - send hash
+            data - send data
         Return:
             response data
             http code
@@ -270,6 +384,30 @@ class GitLabClient(LoggingMixin):
         """
         async with aiohttp.ClientSession(loop=self._loop) as session:
             async with session.put(url, json=data, headers=self._headers) as resp:
+                response_data = await resp.json()
+                self._logging_info("status = %d" % (resp.status))
+                self._logging_debug("send = %s" % (data))
+                self._logging_debug("response_data = %s" % (response_data))
+
+                return response_data, resp.status
+
+    async def _delete_request(self, url, data):
+        """
+        HTTP DELETE request
+
+        Args:
+            url - url
+            data - send data
+        Return:
+            response data
+            http code
+
+        Exceptions:
+            aiohttp.client_exceptions.ClientResponseError - no successful build or job not exist
+            aiohttp.client_exceptions.ClientConnectorError - problem connect
+        """
+        async with aiohttp.ClientSession(loop=self._loop) as session:
+            async with session.delete(url, json=data, headers=self._headers) as resp:
                 response_data = await resp.json()
                 self._logging_info("status = %d" % (resp.status))
                 self._logging_debug("send = %s" % (data))
