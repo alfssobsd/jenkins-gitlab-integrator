@@ -107,6 +107,7 @@ All flows in jenkins combined in groups. if all `jobs` in group is success, `mer
 Examples wokring flows:
 
 ![simple build (pipeline multibranch)](docs/images/jenkins-integrator-config-simple.png)
+
 ![star build (pipeline multibranch)](docs/images/jenkins-integrator-config-star.png)
 
 Go to http://server:port/ui/jenkins-groups for configure.
@@ -199,6 +200,8 @@ make test
 ```
 
 ### <a name="development_libs"></a> Libs
+
+#### Python Libs
 * [https://github.com/aio-libs/aiohttp]
 * [https://github.com/aio-libs/aiomysql]
 * [http://alembic.zzzcomputing.com/en/latest/]
@@ -210,6 +213,8 @@ make test
 * [https://github.com/aio-libs/aiohttp-session]
 * [https://pypi.python.org/pypi/cryptography]
 
+#### UI Libs
+* [https://angular.io/]
 
 ### <a name="development_gitlab_webhook"></a> Gitlab webhook processing
 
