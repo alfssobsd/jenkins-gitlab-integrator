@@ -3,6 +3,7 @@ from functools import wraps
 from server.core.models.delayed_tasks import DelayedTaskManager
 from server.core.models.jenkins_groups import JenkinsGroupManager
 from server.core.models.jenkins_jobs import JenkinsJobManager
+from server.core.clients.gitlab_client import GitLabClient
 
 
 def set_log_marker(func):
@@ -62,6 +63,22 @@ def create_jenkins_job_manager(func):
         db = self.request.app['db_pool']
         db_tables = self.request.app['sa_tables']
         self.jenkins_job_manager = JenkinsJobManager(self.request.marker, db, db_tables)
+        return await func(*args)
+
+    return wrapper
+
+def create_gitlab_client(func):
+    """
+        Decorator for create gitlab_client object
+    """
+    @wraps(func)
+    async def wrapper(*args):
+        self = args[0]
+        db = self.request.app['db_pool']
+        db_tables = self.request.app['sa_tables']
+        gitlab_config = self.request.app['config']['gitlab']
+        self.gitlab_client = GitLabClient(self.request.marker,
+            gitlab_config['url'], gitlab_config['access_token'])
         return await func(*args)
 
     return wrapper

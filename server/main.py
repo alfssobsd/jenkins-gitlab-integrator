@@ -18,7 +18,8 @@ import server.middlewares as middlewares
 from server.core.views.api.admin_config import AdminApiV1ConfigView
 from server.core.views.api.admin_delayed_tasks import AdminApiV1DelayedTasksView, AdminApiV1DelayedTaskDetailView, \
     AdminApiV1DelayedTaskChangeStatusView
-from server.core.views.api.admin_jenkins_group import AdminApiV1JenkinsGroupSearchView, AdminApiV1JenkinsGroupView
+from server.core.views.api.admin_jenkins_group import AdminApiV1JenkinsGroupSearchView, AdminApiV1JenkinsGroupView, \
+    AdminApiV1JenkinsGroupGitlabWebHooksView
 from server.core.views.api.admin_jenkins_job import AdminApiV1JenkinsJobListView, AdminApiV1JenkinsJobView
 from server.core.views.api.common import StatsApiV1View, LoginApiV1View
 from server.utils import TRAFARET
@@ -61,6 +62,8 @@ class RoutesMixin(object):
         self.app.router.add_get('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
         self.app.router.add_put('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
         self.app.router.add_delete('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        #JenkinsGroup hooks
+        self.app.router.add_put('/api/admin/v1/jenkins-group/{id}/hooks', AdminApiV1JenkinsGroupGitlabWebHooksView)
         #Jenkins Group List
         self.app.router.add_get('/api/admin/v1/jenkins-group/{group_id}/jenkins-job', AdminApiV1JenkinsJobListView)
         self.app.router.add_post('/api/admin/v1/jenkins-group/{group_id}/jenkins-job', AdminApiV1JenkinsJobView)
