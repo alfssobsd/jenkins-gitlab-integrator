@@ -1,6 +1,5 @@
-import aiohttp
-from aiohttp import web
 from .common import *
+
 
 class FakeGitLabServer(FakeHTTPServer):
     @get('/api/v4/projects/{project_id}')
@@ -24,6 +23,7 @@ class FakeGitLabServer(FakeHTTPServer):
     async def get_merge_request(self, request):
         merge_id = request.match_info['merge_id']
         project_id = request.match_info['project_id']
+
         def generate_fixture(project_id, merge_id, state):
             return {
                 "id": 100,
@@ -34,6 +34,7 @@ class FakeGitLabServer(FakeHTTPServer):
                 "source_branch": "feature_%d" % int(merge_id),
                 "sha": "6c79b7b61e583cdeb9e2bb806c1bb77416df95e4"
             }
+
         fixture = None
         if merge_id == 1:
             fixture = generate_fixture(project_id, merge_id, 'opened')
@@ -54,20 +55,20 @@ class FakeGitLabServer(FakeHTTPServer):
         project_id = request.match_info['project_id']
         fixture = {
             "id": int(merge_id),
-            "updated_at":"2017-07-07T18:18:18.176+03:00",
+            "updated_at": "2017-07-07T18:18:18.176+03:00",
             "system": False,
-            "body":"(🍏) SUCCESS sha:6c79b7b61e583cdeb9e2bb806c1bb77416df95e4",
-            "noteable_type":"MergeRequest",
+            "body": "(🍏) SUCCESS sha:6c79b7b61e583cdeb9e2bb806c1bb77416df95e4",
+            "noteable_type": "MergeRequest",
             "noteable_id": int(merge_id),
             "attachment": None,
-            "author":{
-                "id":19,
-                "state":"active",
-                "web_url":"https://gitlab.example.local/gitlab_bot",
-                "name":"gitlab_bot",
-                "username":"gitlab_bot",
-                "avatar_url":"https://gitlab.example.local/uploads/system/user/avatar/19/bot-512.png"
-          }
+            "author": {
+                "id": 19,
+                "state": "active",
+                "web_url": "https://gitlab.example.local/gitlab_bot",
+                "name": "gitlab_bot",
+                "username": "gitlab_bot",
+                "avatar_url": "https://gitlab.example.local/uploads/system/user/avatar/19/bot-512.png"
+            }
         }
         return web.json_response(fixture)
 
@@ -79,19 +80,19 @@ class FakeGitLabServer(FakeHTTPServer):
         noteable_id = request.match_info['noteable_id']
         fixture = {
             "id": int(noteable_id),
-            "updated_at":"2017-07-07T18:18:18.176+03:00",
+            "updated_at": "2017-07-07T18:18:18.176+03:00",
             "system": False,
-            "body":"(🍏) SUCCESS sha:6c79b7b61e583cdeb9e2bb806c1bb77416df95e4",
-            "noteable_type":"MergeRequest",
+            "body": "(🍏) SUCCESS sha:6c79b7b61e583cdeb9e2bb806c1bb77416df95e4",
+            "noteable_type": "MergeRequest",
             "noteable_id": int(noteable_id),
             "attachment": None,
-            "author":{
-                "id":19,
-                "state":"active",
-                "web_url":"https://gitlab.example.local/gitlab_bot",
-                "name":"gitlab_bot",
-                "username":"gitlab_bot",
-                "avatar_url":"https://gitlab.example.local/uploads/system/user/avatar/19/bot-512.png"
-          }
+            "author": {
+                "id": 19,
+                "state": "active",
+                "web_url": "https://gitlab.example.local/gitlab_bot",
+                "name": "gitlab_bot",
+                "username": "gitlab_bot",
+                "avatar_url": "https://gitlab.example.local/uploads/system/user/avatar/19/bot-512.png"
+            }
         }
         return web.json_response(fixture)

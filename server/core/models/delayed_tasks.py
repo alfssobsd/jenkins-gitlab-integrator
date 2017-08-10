@@ -78,7 +78,7 @@ class DelayedTask(object):
         return result
 
     def __repr__(self):
-        msg = "DelayedTask %s" % (self.values)
+        msg = "DelayedTask %s" % self.values
         return msg
 
     @staticmethod
@@ -187,7 +187,7 @@ class DelayedTaskManager(LoggingMixin):
             try:
                 q = self._delayed_tasks.insert(). \
                     values(delayed_task.values)
-                result = await conn.execute(q)
+                await conn.execute(q)
                 await trans.commit()
                 self._logging_debug('Commit')
             except Exception as e:
@@ -267,7 +267,7 @@ class DelayedTaskManager(LoggingMixin):
                 and anower from sqlalchemy
         """
         self._logging_debug("Get delayed_task with status: %s" % task_status.name)
-        return (await self.search(task_status=task_status.name))
+        return await self.search(task_status=task_status.name, limit=limit)
 
     async def get_by_status_new(self, limit=150):
         """
@@ -301,7 +301,7 @@ class DelayedTaskManager(LoggingMixin):
                 q = self._delayed_tasks.update(self._delayed_tasks.c.id == delayed_task_id).values(counter_attempts=0)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
@@ -329,7 +329,7 @@ class DelayedTaskManager(LoggingMixin):
                     counter_attempts=self._delayed_tasks.c.counter_attempts + 1)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
@@ -356,13 +356,13 @@ class DelayedTaskManager(LoggingMixin):
                 self._logging_debug(q)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
 
     async def set_gitlab_merge_comment_id(self, delayed_task_id, gitlab_merge_comment_id):
-        self._logging_debug("Set gitlab_merge_comment_id %d for delayed task with id: %d" \
+        self._logging_debug("Set gitlab_merge_comment_id %d for delayed task with id: %d"
                             % (gitlab_merge_comment_id, delayed_task_id))
         await self.update_values(delayed_task_id, {'gitlab_merge_comment_id': gitlab_merge_comment_id})
 
@@ -453,7 +453,7 @@ class DelayedTaskManager(LoggingMixin):
                 self._logging_debug(q)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise

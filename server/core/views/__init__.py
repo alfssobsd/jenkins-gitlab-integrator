@@ -67,10 +67,12 @@ def create_jenkins_job_manager(func):
 
     return wrapper
 
+
 def create_gitlab_client(func):
     """
         Decorator for create gitlab_client object
     """
+
     @wraps(func)
     async def wrapper(*args):
         self = args[0]
@@ -78,7 +80,8 @@ def create_gitlab_client(func):
         db_tables = self.request.app['sa_tables']
         gitlab_config = self.request.app['config']['gitlab']
         self.gitlab_client = GitLabClient(self.request.marker,
-            gitlab_config['url'], gitlab_config['access_token'])
+                                          gitlab_config['url'],
+                                          gitlab_config['access_token'])
         return await func(*args)
 
     return wrapper

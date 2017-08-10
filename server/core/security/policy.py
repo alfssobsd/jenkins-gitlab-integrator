@@ -105,7 +105,7 @@ async def is_authenticated(request):
             or
             False - if not auth
     """
-    return (await check_permission(request, Permission.ONLY_AUTH))
+    return await check_permission(request, Permission.ONLY_AUTH)
 
 
 async def logout(request):
@@ -120,7 +120,7 @@ async def logout(request):
     """
     index_url = request.app.router['index'].url()
     response = web.HTTPFound(index_url)
-    if (await is_authenticated(request)):
+    if await is_authenticated(request):
         await aiohttp_security.forget(request, response)
     return True
 

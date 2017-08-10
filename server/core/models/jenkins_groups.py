@@ -1,6 +1,3 @@
-import enum
-import hashlib
-import json
 from sqlalchemy import desc
 
 from server.core.common import LoggingMixin
@@ -30,6 +27,7 @@ class JenkinsGroup(object):
     def __repr__(self):
         msg = "JenkinsGroup %s" % (self.values)
         return msg
+
 
 class JenkinsGroupManager(LoggingMixin):
     """ Class for managment data in jenkins_groups table"""

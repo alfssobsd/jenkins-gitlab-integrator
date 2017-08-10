@@ -1,6 +1,7 @@
-import pytest
 import aiohttp
-from server.core.clients.jenkins_client import JenkinsClient, JenkinsBuildInfo
+import pytest
+
+from server.core.clients.jenkins_client import JenkinsClient
 
 
 async def test_jenkins_get_last_success_build_first(loop, fixture_fake_jenkins_server):
@@ -12,8 +13,8 @@ async def test_jenkins_get_last_success_build_first(loop, fixture_fake_jenkins_s
     repo_remote_url = "ssh://git@gitlab.example.local:2222/Sergey.Kravchuk/%s.git" % (job_name)
     build_info = await jc.get_last_success_build(job_base_path, job_name, branch, repo_remote_url)
     assert build_info.number == 1
-    assert build_info.upsteram_build_number == None
-    assert build_info.upsteram_project == None
+    assert build_info.upsteram_build_number is None
+    assert build_info.upsteram_project is None
     assert build_info.repo_remote_url == repo_remote_url
     assert build_info.sha1 == "0692f3f7f5f764a8a31b34ae768cb513ccc780b8"
     assert build_info.result == "SUCCESS"

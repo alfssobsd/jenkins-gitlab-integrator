@@ -1,9 +1,9 @@
-def generate_last_successful_build(base_url = None, group_folder = None, job_name = None, branch = None, build_number = 1,
-                                        upstream_job_name = None, upstream_build_number = 1, repo_url = None,
-                                        result = "SUCCESS"):
+def generate_last_successful_build(base_url=None, group_folder=None, job_name=None, branch=None, build_number=1,
+                                   upstream_job_name=None, upstream_build_number=1, repo_url=None,
+                                   result="SUCCESS"):
     data = {
         "_class": "org.jenkinsci.plugins.workflow.job.WorkflowRun",
-        "actions":[
+        "actions": [
             {},
             {
                 "_class": "hudson.plugins.git.util.BuildData",
@@ -30,22 +30,22 @@ def generate_last_successful_build(base_url = None, group_folder = None, job_nam
                                 }
                             ]
                         }
-                        }
-                    },
-                    "lastBuiltRevision": {
-                        "SHA1": "2e83e6a19d57bac6229c542c05ff98b3683c356e",
-                        "branch": [
-                            {
-                                "SHA1": "2e83e6a19d57bac6229c542c05ff98b3683c356e",
-                                "name": "lib-pipline-branch"
-                            }
-                        ]
-                    },
-                    "remoteUrls": [
-                        "ssh://git@gitlab.example.local:2222/DevOps/Jenkins/lib-pipeline-common.git"
-                    ],
-                    "scmName": ""
+                    }
                 },
+                "lastBuiltRevision": {
+                    "SHA1": "2e83e6a19d57bac6229c542c05ff98b3683c356e",
+                    "branch": [
+                        {
+                            "SHA1": "2e83e6a19d57bac6229c542c05ff98b3683c356e",
+                            "name": "lib-pipline-branch"
+                        }
+                    ]
+                },
+                "remoteUrls": [
+                    "ssh://git@gitlab.example.local:2222/DevOps/Jenkins/lib-pipeline-common.git"
+                ],
+                "scmName": ""
+            },
             {
                 "_class": "hudson.plugins.git.GitTagAction"
             },
@@ -113,13 +113,14 @@ def generate_last_successful_build(base_url = None, group_folder = None, job_nam
             {
                 "_class": "hudson.model.CauseAction",
                 "causes": [
-                            {
-                                "_class": "hudson.model.Cause$UpstreamCause",
-                                "shortDescription": "Started by upstream project \"%s/%s/%s\" build number %d" % (group_folder, job_name, branch, upstream_build_number),
-                                "upstreamBuild": upstream_build_number,
-                                "upstreamProject": "%s/%s/%s" % (group_folder, upstream_job_name, branch),
-                                "upstreamUrl": "job/%s/job/%s/job/%s/" % (group_folder, upstream_job_name, branch)
-                            }
+                    {
+                        "_class": "hudson.model.Cause$UpstreamCause",
+                        "shortDescription": "Started by upstream project \"%s/%s/%s\" build number %d" % (
+                        group_folder, job_name, branch, upstream_build_number),
+                        "upstreamBuild": upstream_build_number,
+                        "upstreamProject": "%s/%s/%s" % (group_folder, upstream_job_name, branch),
+                        "upstreamUrl": "job/%s/job/%s/job/%s/" % (group_folder, upstream_job_name, branch)
+                    }
                 ]
             })
     return data

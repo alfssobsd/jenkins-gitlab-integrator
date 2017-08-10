@@ -131,7 +131,6 @@ class GitLabMergeService(LoggingMixin):
             jenkins_group = await self._jenkins_group_manager.find_by_name(delayed_task.group)
             jenkins_jobs = await self._jenkins_job_manager.find_by_group_id(jenkins_group.id)
             job_path_finder = JenkinsJobPathFinder(jenkins_jobs)
-            jenkins_jobs_first = await self._jenkins_job_manager.find_first_by_group_id(jenkins_group.id)
 
             paths = job_path_finder.get_all_paths()
             self._logging_debug(paths)
@@ -159,7 +158,7 @@ class GitLabMergeService(LoggingMixin):
                             return False
 
                     # failure build if not correct flow
-                    if not prev_build_info is None:
+                    if prev_build_info is not None:
                         if not build_info.upsteram_build_number == prev_build_info.number:
                             return False
 
@@ -168,10 +167,10 @@ class GitLabMergeService(LoggingMixin):
                         return False
 
                     prev_build_info = build_info
-        except (ClientResponseError) as e:
+        except ClientResponseError as e:
             self._logging_debug(e)
             return False
-        except (ClientConnectorError) as e:
+        except ClientConnectorError as e:
             self._logging_error(e)
             return False
 
@@ -213,7 +212,7 @@ class GitLabMergeService(LoggingMixin):
                                                                                            '(🍋) WAIT STATUS sha:%s' % delayed_task.sha1)
         await self._delayed_task_manager.set_gitlab_merge_comment_id(delayed_task.id,
                                                                      delayed_task.gitlab_merge_comment_id)
-        self._logging_info("delayed_task was created %s" % (delayed_task))
+        self._logging_info("delayed_task was created %s" % delayed_task)
 
         # increment attempts
         await self._delayed_task_manager.increment_attempts(delayed_task.id)
@@ -236,7 +235,7 @@ class GitLabMergeService(LoggingMixin):
             await self._delayed_task_manager.set_gitlab_merge_comment_id(delayed_task.id,
                                                                          delayed_task.gitlab_merge_comment_id)
             await self._delayed_task_manager.set_status_canceled(delayed_task.id)
-        except RecordNotFound as e:
+        except RecordNotFound:
             pass
         except Exception as e:
             self._logging_error(e)

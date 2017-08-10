@@ -1,7 +1,6 @@
-import asyncio
-import socket
 import json
 from functools import wraps
+
 from aiohttp import web
 from aiohttp.test_utils import unused_port
 

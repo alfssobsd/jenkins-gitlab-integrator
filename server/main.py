@@ -29,42 +29,43 @@ from .core.views.common import IndexUIView, IndexView
 from .core.workers.gitlab_worker import GitLabWorker
 from .core.security.policy import FileAuthorizationPolicy
 
+
 class SecurityMixnin(object):
     def setup_security(self):
         secret_key = base64.urlsafe_b64decode(self.app['config']['session_secret'])
         setup_session(self.app, EncryptedCookieStorage(secret_key))
         setup_security(self.app, SessionIdentityPolicy(), FileAuthorizationPolicy(self.app['config']['users']))
 
-class RoutesMixin(object):
 
+class RoutesMixin(object):
     PROJECT_ROOT = pathlib.Path(__file__).parent
 
     def setup_routes(self):
         self.app['PROJECT_ROOT'] = self.PROJECT_ROOT
-        #ui
+        # ui
         self.app.router.add_get('/', IndexView, name='index')
         self.app.router.add_get('/ui/', IndexUIView, name='index_ui_root')
         self.app.router.add_get('/ui/{path:.*}', IndexUIView, name='index_ui')
-        #api common
+        # api common
         self.app.router.add_get('/api/v1/stats', StatsApiV1View)
         self.app.router.add_post('/api/v1/login', LoginApiV1View)
         self.app.router.add_delete('/api/v1/logout', LoginApiV1View)
-        #Config
+        # Config
         self.app.router.add_get('/api/admin/v1/config', AdminApiV1ConfigView)
-        #DelayedTask
+        # DelayedTask
         self.app.router.add_get('/api/admin/v1/delayed-task', AdminApiV1DelayedTasksView)
         self.app.router.add_get('/api/admin/v1/delayed-task/{id}', AdminApiV1DelayedTaskDetailView)
         self.app.router.add_post('/api/admin/v1/delayed-task/{id}/status', AdminApiV1DelayedTaskChangeStatusView)
-        #JenkinsGroup search
+        # JenkinsGroup search
         self.app.router.add_get('/api/admin/v1/jenkins-group', AdminApiV1JenkinsGroupSearchView)
-        #JenkinsGroup managment
+        # JenkinsGroup managment
         self.app.router.add_post('/api/admin/v1/jenkins-group', AdminApiV1JenkinsGroupView)
         self.app.router.add_get('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
         self.app.router.add_put('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
         self.app.router.add_delete('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
-        #JenkinsGroup hooks
+        # JenkinsGroup hooks
         self.app.router.add_put('/api/admin/v1/jenkins-group/{id}/hooks', AdminApiV1JenkinsGroupGitlabWebHooksView)
-        #Jenkins Group List
+        # Jenkins Group List
         self.app.router.add_get('/api/admin/v1/jenkins-group/{group_id}/jenkins-job', AdminApiV1JenkinsJobListView)
         self.app.router.add_post('/api/admin/v1/jenkins-group/{group_id}/jenkins-job', AdminApiV1JenkinsJobView)
         self.app.router.add_get('/api/admin/v1/jenkins-group/{group_id}/jenkins-job/{id}', AdminApiV1JenkinsJobView)
@@ -76,11 +77,13 @@ class RoutesMixin(object):
         self.app.router.add_post('/gitlab/group/{group}/job/{job_name}', GitLabWebhookView)
         self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
 
+
 class CommandLineOptionsMixin(object):
     def read_cmdline(self, argv):
         ap = argparse.ArgumentParser()
         commandline.standard_argparse_options(ap, default_config='./config/server.yml')
         return ap.parse_args(argv)
+
 
 class ConfigMixin(object):
     def read_config(self, options):
@@ -106,7 +109,6 @@ class BackgroundWorkerMixin(object):
 
 
 class DBConnectorMixin(object):
-
     async def init_connect_db(self, app):
         app['config']['mysql']['autocommit'] = True
         engine = await create_engine(loop=app.loop, **app['config']['mysql'])
@@ -115,6 +117,7 @@ class DBConnectorMixin(object):
     async def close_connect_db(self, app):
         app['db_pool'].close()
         await app['db_pool'].wait_closed()
+
 
 class DBTablesMixin(object):
     def _get_mysql_creator(self):
@@ -147,7 +150,7 @@ class LoggerSetupMixin(object):
 
 
 class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin,
-    DBTablesMixin, LoggerSetupMixin, BackgroundWorkerMixin, SecurityMixnin):
+             DBTablesMixin, LoggerSetupMixin, BackgroundWorkerMixin, SecurityMixnin):
     """
     Server entrypoint
     """

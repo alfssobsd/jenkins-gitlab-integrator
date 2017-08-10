@@ -1,5 +1,3 @@
-from sqlalchemy import desc
-
 from server.core.common import LoggingMixin
 from server.core.models import RecordNotFound
 
@@ -33,6 +31,7 @@ class JenkinsJob(object):
         msg = "JenkinsJob %s" % (self.values)
         return msg
 
+
 class JenkinsJobPathFinder(object):
     """" Class for search jobs path """
 
@@ -43,8 +42,6 @@ class JenkinsJobPathFinder(object):
         """
         Return all find paths for run
 
-        Args:
-            None
         Return:
             [
                 [JenkinsJob, JenkinsJob, JenkinsJob],
@@ -74,6 +71,7 @@ class JenkinsJobPathFinder(object):
 
         path = [job]
         seen = {job.id}
+
         def search():
             dead_end = True
             for neighbour_job in graph[path[-1].id]:
@@ -86,7 +84,9 @@ class JenkinsJobPathFinder(object):
                     seen.remove(neighbour_job.id)
             if dead_end:
                 yield list(path)
+
         yield from search()
+
 
 class JenkinsJobManager(LoggingMixin):
     """ Class for managment data in jenkins_jobs table"""
@@ -112,8 +112,8 @@ class JenkinsJobManager(LoggingMixin):
 
         columns = self._jenkins_jobs.c
         async with self.db_pool.acquire() as conn:
-            q = self._jenkins_jobs.select().\
-                where(columns.jenkins_group_id == jenkins_group_id).\
+            q = self._jenkins_jobs.select(). \
+                where(columns.jenkins_group_id == jenkins_group_id). \
                 order_by(columns.id)
             self._logging_debug(q)
             result = await conn.execute(q)
@@ -137,12 +137,12 @@ class JenkinsJobManager(LoggingMixin):
 
         columns = self._jenkins_jobs.c
         async with self.db_pool.acquire() as conn:
-            q = self._jenkins_jobs.select().\
-                where(columns.jenkins_group_id == jenkins_group_id).\
+            q = self._jenkins_jobs.select(). \
+                where(columns.jenkins_group_id == jenkins_group_id). \
                 where(columns.jenkins_job_perent_id == None)
             self._logging_debug(q)
             result = await conn.execute(q)
-            #get first row
+            # get first row
             row = await result.fetchone()
             if row is None:
                 msg = "JenkinsGroup with jenkins_group_id: {} does not exists"
@@ -170,7 +170,7 @@ class JenkinsJobManager(LoggingMixin):
             q = self._jenkins_jobs.select().where(self._jenkins_jobs.c.id == job_id)
             self._logging_debug(q)
             result = await conn.execute(q)
-            #get first row
+            # get first row
             row = await result.fetchone()
             if row is None:
                 msg = "JenkinsJob with id: {} does not exists"

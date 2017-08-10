@@ -1,9 +1,9 @@
 from aiohttp import web
 
 from server.core.common import LoggingMixin
-from server.core.security.policy import auth_by_gitlab_token, require_permission, Permission
-from server.core.services.gitlab_push_service import GitLabPushService
+from server.core.security.policy import auth_by_gitlab_token
 from server.core.services.gitlab_merge_service import GitLabMergeService
+from server.core.services.gitlab_push_service import GitLabPushService
 from . import set_log_marker
 
 

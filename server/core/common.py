@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 class LoggingMixin(object):
     """
     Mixin for logging
@@ -24,7 +25,8 @@ class LoggingMixin(object):
         self._logger.exception(self._logging_message(message))
 
     def _logging_message(self, message):
-        return self._LOG_MESSAGE_FORMAT % {'marker': self._marker, 'method': self._fullname_caller(), 'message': message}
+        return self._LOG_MESSAGE_FORMAT % {'marker': self._marker, 'method': self._fullname_caller(),
+                                           'message': message}
 
     def _fullname_caller(self):
         return self.__module__ + "." + self.__class__.__name__ + "." + sys._getframe(3).f_code.co_name
