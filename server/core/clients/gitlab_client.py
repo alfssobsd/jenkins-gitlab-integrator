@@ -217,14 +217,13 @@ class GitLabClient(LoggingMixin):
 
         return GitLabMerge.from_api_json(data)
 
-    async def create_webhook(self, project_id, url, token):
+    async def create_webhook(self, project_id, hook):
         """
         Create project webhook
 
         Args:
             project_id - project id
-            url - url webhook
-            token - secret token for webhook
+            hook - GitLabWebHook object
 
         Return:
             GitLabWebHook
@@ -234,14 +233,13 @@ class GitLabClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
 
-
         url = self._api_url(_PROJECT_HOOKS, **{'base_url': self._base_url, 'project_id': project_id})
         self._logging_info("url=%s" % url)
 
         obj = GitLabWebHook()
-        obj.url = url
+        obj.url = hook_url
         obj.token = token
-        data, status = await self._post_request(url, obj.values)
+        data, status = await self._post_request(url, hook.values)
 
         self._logging_info("status = %d" % status)
         self._logging_debug("create GitLabWebHook = %s" % GitLabWebHook.from_json(data))
@@ -314,7 +312,8 @@ class GitLabClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         url = self._api_url(_PROJECT_HOOK, **{'base_url': self._base_url,
-            'project_id': project_id, 'hook_id': hook_id})
+                                              'project_id': project_id,
+                                              'hook_id': hook_id})
         self._logging_info("url=%s" % url)
         data, status = await self._delete_request(url, {})
         self._logging_info("status = %d" % status)
