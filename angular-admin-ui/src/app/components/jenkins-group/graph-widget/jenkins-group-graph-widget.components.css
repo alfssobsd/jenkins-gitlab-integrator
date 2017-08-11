@@ -4,7 +4,7 @@
   stroke-width: 5px;
 }
 .node text {
-  font: 10px sans-serif;
+  font: 16px sans-serif;
 }
 .node--internal circle {
   fill: #555;
@@ -22,4 +22,9 @@
   background: #000;
   width: 30px;
   height:30px;
+}
+
+.graph-widget {
+  border: 1px dashed;
+  color: #777;
 }

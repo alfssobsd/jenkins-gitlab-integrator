@@ -6,14 +6,14 @@ import { JenkinsJob } from "../../../models/jenkins-job";
 
 @Component({
   selector: 'app-jenins-group-graph-widget',
-  template: '<div class="graph-widget"><svg /></div>',
+  template: '<div id="graph-widget-id" class="graph-widget"></div>',
   styleUrls: ['./jenkins-group-graph-widget.components.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
   private parentNativeElement: any;
   private width = 800;
-  private height = 200;
+  private height = 400;
   private svg;
   private treeData: any;
   @Input() jenkinsJobList: JenkinsJob[];
@@ -24,6 +24,7 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
+    this.width = document.getElementById("graph-widget-id").offsetWidth;
     if (this.svg) {
       this.svg.remove();
     }
@@ -62,7 +63,7 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
 
   private createZoomElem(svg: Selection<BaseType, any, HTMLElement, any>) {
     return svg.append('g')
-      .attr('transform', 'translate(40,0)scale(0.8,0.8)');
+      .attr('transform', 'translate(100,0)scale(0.8,0.8)');
   }
 
   private createTreeView(root: any) {
