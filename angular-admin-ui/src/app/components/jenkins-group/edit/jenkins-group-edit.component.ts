@@ -47,19 +47,20 @@ export class JenkinsGroupEditComponent implements OnInit {
   }
 
   saveJob(): void {
-    this.refreshGraph();
     if (!this.selectJenkinsJob.id) {
       this.selectJenkinsJob.jenkins_group_id = this.jenkinsGroup.id
       this.jenkinsJobServices.createJenkinsJob(this.selectJenkinsJob)
         .then(job => {
           this.jenkinsJobList.push(job)
           this.selectJenkinsJob = new JenkinsJob();
+          this.refreshGraph();
         })
     } else {
       this.jenkinsJobServices.updateJenkinsJob(this.selectJenkinsJob)
         .then(job => {
           this.selectJenkinsJob = job;
           this.selectJenkinsJob = new JenkinsJob();
+          this.refreshGraph();
         })
     }
   }

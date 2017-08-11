@@ -15,7 +15,7 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
   private width = 800;
   private height = 200;
   private svg;
-  private treeData: any = {'name': 'first','children': [{'name': 'second','children': []}]};
+  private treeData: any;
   @Input() jenkinsJobList: JenkinsJob[];
   @Input() refreshTrigger: number;
 
@@ -27,8 +27,7 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
     if (this.svg) {
       this.svg.remove();
     }
-    this.treeData = {'name': this.jenkinsJobList[0].name,'children': [{'name': 'second','children': []}]};
-    this.convertJobListToTreeData(this.jenkinsJobList)
+    this.treeData = this.convertJobListToTreeData(this.jenkinsJobList)
     this.svg = this.setSvg();
     const root = this.createHierarchy();
 
@@ -41,16 +40,24 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
     this.svg.remove();
   }
 
-  private convertJobListToTreeData(jobs: JenkinsJob[]) {
-    let firstJob:JenkinsJob;
+  private convertJobListToTreeData(jobs: JenkinsJob[]): any {
+    let treeData = {};
+    let firstJob = jobs.find(el => el.jenkins_job_perent_id == null)
+    if (firstJob) {
+      treeData = this.findChildren(firstJob, jobs.slice());
+    }
+    return treeData;
+  }
+
+  private findChildren(job: JenkinsJob, jobs:JenkinsJob[]): any {
+    let node = {'name': job.name, 'children': []}
     jobs.forEach((item, index) => {
-      if (item.jenkins_job_perent_id == null) {
-        firstJob = item
+      if (item.jenkins_job_perent_id == job.id) {
+        jobs.slice(index, 1)
+        node.children.push(this.findChildren(item, jobs))
       }
     })
-    let tree = {'job': firstJob, 'children': []}
-    console.log('first job')
-    console.log(firstJob)
+    return node;
   }
 
   private createZoomElem(svg: Selection<BaseType, any, HTMLElement, any>) {
