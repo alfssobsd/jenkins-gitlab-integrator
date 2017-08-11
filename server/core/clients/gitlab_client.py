@@ -115,7 +115,7 @@ class GitLabWebHook(object):
         return result
 
     def __repr__(self):
-        msg = "GitLabWebHook %s" % (self.values)
+        msg = "GitLabWebHook %s" % self.values
         return msg
 
     @staticmethod
@@ -338,8 +338,8 @@ class GitLabClient(LoggingMixin):
         async with aiohttp.ClientSession(loop=self._loop) as session:
             async with session.get(url, headers=self._headers) as resp:
                 response_data = await resp.json()
-                self._logging_info("status = %d" % (resp.status))
-                self._logging_debug("response_data = %s" % (response_data))
+                self._logging_info("status = %d" % resp.status)
+                self._logging_debug("response_data = %s" % response_data)
 
                 return response_data, resp.status
 
@@ -361,9 +361,9 @@ class GitLabClient(LoggingMixin):
         async with aiohttp.ClientSession(loop=self._loop) as session:
             async with session.post(url, json=data, headers=self._headers) as resp:
                 response_data = await resp.json()
-                self._logging_info("status = %d" % (resp.status))
-                self._logging_debug("send = %s" % (data))
-                self._logging_debug("response_data = %s" % (response_data))
+                self._logging_info("status = %d" % resp.status)
+                self._logging_debug("send = %s" % data)
+                self._logging_debug("response_data = %s" % response_data)
 
                 return response_data, resp.status
 
@@ -385,9 +385,9 @@ class GitLabClient(LoggingMixin):
         async with aiohttp.ClientSession(loop=self._loop) as session:
             async with session.put(url, json=data, headers=self._headers) as resp:
                 response_data = await resp.json()
-                self._logging_info("status = %d" % (resp.status))
-                self._logging_debug("send = %s" % (data))
-                self._logging_debug("response_data = %s" % (response_data))
+                self._logging_info("status = %d" % resp.status)
+                self._logging_debug("send = %s" % data)
+                self._logging_debug("response_data = %s" % response_data)
 
                 return response_data, resp.status
 
@@ -409,9 +409,9 @@ class GitLabClient(LoggingMixin):
         async with aiohttp.ClientSession(loop=self._loop) as session:
             async with session.delete(url, json=data, headers=self._headers) as resp:
                 response_data = await resp.text()
-                self._logging_info("status = %d" % (resp.status))
-                self._logging_debug("send = %s" % (data))
-                self._logging_debug("response_data = %s" % (response_data))
+                self._logging_info("status = %d" % resp.status)
+                self._logging_debug("send = %s" % data)
+                self._logging_debug("response_data = %s" % response_data)
 
                 return response_data, resp.status
 

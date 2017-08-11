@@ -28,7 +28,7 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
     if (this.svg) {
       this.svg.remove();
     }
-    this.treeData = this.convertJobListToTreeData(this.jenkinsJobList)
+    this.treeData = this.convertJobListToTreeData(this.jenkinsJobList);
     this.svg = this.setSvg();
     const root = this.createHierarchy();
 
@@ -43,7 +43,7 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
 
   private convertJobListToTreeData(jobs: JenkinsJob[]): any {
     let treeData = {};
-    let firstJob = jobs.find(el => el.jenkins_job_perent_id == null)
+    let firstJob = jobs.find(el => el.jenkins_job_perent_id == null);
     if (firstJob) {
       treeData = this.findChildren(firstJob, jobs.slice());
     }
@@ -51,13 +51,13 @@ export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
   }
 
   private findChildren(job: JenkinsJob, jobs:JenkinsJob[]): any {
-    let node = {'name': job.name, 'children': []}
+    let node = {'name': job.name, 'children': []};
     jobs.forEach((item, index) => {
       if (item.jenkins_job_perent_id == job.id) {
-        jobs.slice(index, 1)
+        jobs.slice(index, 1);
         node.children.push(this.findChildren(item, jobs))
       }
-    })
+    });
     return node;
   }
 
