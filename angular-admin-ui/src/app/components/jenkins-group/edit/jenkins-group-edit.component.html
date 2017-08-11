@@ -1,4 +1,7 @@
 <div class="row">
+
+</div>
+<div class="row">
   <div class="col-xs-12 col-lg-12">
     <section *ngIf="jenkinsGroup" class="box">
       <header>
@@ -16,6 +19,8 @@
           </div>
           <button (click)="save()" class="btn btn-default">Save</button>
         </form>
+        <hr>
+        <a (click)="updateWebHooks()" class="btn btn-primary" href="javascript:void(0)"> Update WebHooks </a>
       </div>
     </section>
   </div>
@@ -42,9 +47,6 @@
             <span class="glyphicon glyphicon-floppy-disk"></span>
           </button>
         </form>
-        <div style="margin-top: 10px;">
-          <a (click)="updateWebHooks()" class="btn btn-primary" href="javascript:void(0)"> Update WebHooks </a>
-        </div>
         <hr>
         <table class="table table-hover">
           <thead>
@@ -73,6 +75,26 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+  </div>
+  <div class="col-xs-12 col-lg-12">
+    <section *ngIf="jenkinsJobList" class="box">
+      <header>
+        <h2 class="title pull-left">
+          jobs graph
+        </h2>
+      </header>
+      <div class="content-body">
+        <div class="row">
+          <div class="col-xs-12 col-lg-12">
+            <p class="text-muted">Use the scroll to zoom</p>
+          </div>
+          <div class="col-lg-12 col-xs-12">
+            <app-jenins-group-graph-widget [jenkinsJobList]="jenkinsJobList" [refreshTrigger]="refreshGrpahTrigger">
+            </app-jenins-group-graph-widget>
+          </div>
+        </div>
       </div>
     </section>
   </div>

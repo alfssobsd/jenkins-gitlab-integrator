@@ -16,6 +16,7 @@ export class JenkinsGroupEditComponent implements OnInit {
   jenkinsGroup: JenkinsGroup;
   jenkinsJobList: JenkinsJob[];
   selectJenkinsJob: JenkinsJob;
+  refreshGrpahTrigger: number = 0;
 
   constructor(
     private jenkinsGroupService:JenkinsGroupService,
@@ -46,6 +47,7 @@ export class JenkinsGroupEditComponent implements OnInit {
   }
 
   saveJob(): void {
+    this.refreshGraph();
     if (!this.selectJenkinsJob.id) {
       this.selectJenkinsJob.jenkins_group_id = this.jenkinsGroup.id
       this.jenkinsJobServices.createJenkinsJob(this.selectJenkinsJob)
@@ -67,6 +69,7 @@ export class JenkinsGroupEditComponent implements OnInit {
       this.jenkinsJobServices.deleteJenkinsJob(job)
       .then(() => {
         this.jenkinsJobList = this.jenkinsJobList.filter(j => j !== job);
+        this.refreshGraph();
       });
     }
   }
@@ -80,4 +83,7 @@ export class JenkinsGroupEditComponent implements OnInit {
     this.location.back();
   }
 
+  private refreshGraph() {
+    this.refreshGrpahTrigger += 1;
+  }
 }

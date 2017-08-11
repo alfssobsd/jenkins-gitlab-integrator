@@ -24,6 +24,7 @@ Menu:
   * [Prepare DB](#development_db)
   * [Libs](#development_libs)
   * [GitLab webhook processing](#development_gitlab_webhook)
+* [Thanks](#thanks)
 
 
 ## <a name="usage"></a> Usage
@@ -218,3 +219,6 @@ make test
 ![merge processing](docs/images/jenkins-integrator-gitlab-webhook-merge.jpg)
 
 
+# <a name="thanks"></a> Thanks
+
+* Alex Zolotyh <aazolotyh@gmail.com>
