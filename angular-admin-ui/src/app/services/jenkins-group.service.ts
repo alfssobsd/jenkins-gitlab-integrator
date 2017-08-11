@@ -57,6 +57,14 @@ export class JenkinsGroupService {
       .catch(this.handleError);
   }
 
+  updateJenkinsGroupWebhooks(id:number): Promise<string> {
+    const url = `${this.jenkinsGroupUrl}/${id}/hooks`;
+    return this.http.put(url, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as string)
+      .catch(this.handleError);
+  }
+
   private handleError(error: any): Promise<any> {
     console.error('ERROR (JenkinsGroup API)', error);
     return Promise.reject(error.message || error);

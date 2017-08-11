@@ -113,7 +113,7 @@ class AdminApiV1JenkinsGroupGitlabWebHooksView(web.View, LoggingMixin):
             # delete old hooks
             hooks = await self.gitlab_client.get_webhooks(job.gitlab_project_id)
             for hook in hooks:
-                if hook is not None and hook.url == hook_url:
+                if hook.url is not None and hook.url == hook_url:
                     await self.gitlab_client.delete_webhook(job.gitlab_project_id, hook.id)
 
             # make new hook object

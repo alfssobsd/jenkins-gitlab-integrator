@@ -123,9 +123,11 @@ class GitLabWebHook(object):
         obj = GitLabWebHook()
         obj.id = json_data['id']
         obj.url = json_data['url']
-        obj.url = json_data['push_events']
-        obj.url = json_data['merge_requests_events']
-        obj.url = json_data['enable_ssl_verification']
+        obj.push_events = json_data['push_events']
+        obj.merge_requests_events = json_data['merge_requests_events']
+        obj.enable_ssl_verification = json_data['enable_ssl_verification']
+
+        return obj
 
 
 class GitLabClient(LoggingMixin):
@@ -169,6 +171,8 @@ class GitLabClient(LoggingMixin):
         webhooks = list()
         for item in data:
             webhooks.append(GitLabWebHook.from_json(item))
+
+        self._logging_debug(webhooks)
 
         return webhooks
 
@@ -236,9 +240,6 @@ class GitLabClient(LoggingMixin):
         url = self._api_url(_PROJECT_HOOKS, **{'base_url': self._base_url, 'project_id': project_id})
         self._logging_info("url=%s" % url)
 
-        obj = GitLabWebHook()
-        obj.url = hook_url
-        obj.token = token
         data, status = await self._post_request(url, hook.values)
 
         self._logging_info("status = %d" % status)
@@ -407,7 +408,7 @@ class GitLabClient(LoggingMixin):
         """
         async with aiohttp.ClientSession(loop=self._loop) as session:
             async with session.delete(url, json=data, headers=self._headers) as resp:
-                response_data = await resp.json()
+                response_data = await resp.text()
                 self._logging_info("status = %d" % (resp.status))
                 self._logging_debug("send = %s" % (data))
                 self._logging_debug("response_data = %s" % (response_data))

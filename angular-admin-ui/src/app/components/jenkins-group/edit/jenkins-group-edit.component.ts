@@ -71,6 +71,11 @@ export class JenkinsGroupEditComponent implements OnInit {
     }
   }
 
+  updateWebHooks(): void {
+    this.jenkinsGroupService.updateJenkinsGroupWebhooks(this.jenkinsGroup.id)
+      .then(() => {})
+  }
+
   goBack(): void {
     this.location.back();
   }
