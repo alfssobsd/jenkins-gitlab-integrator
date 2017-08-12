@@ -1,0 +1,80 @@
+import { Component, Input, OnInit, SimpleChange,  SimpleChanges } from '@angular/core';
+import { JenkinsJob } from "../../models/jenkins-job";
+import { JenkinsJobService } from "../../services/jenkins-job.service";
+import { JenkinsGroup } from "../../models/jenkins-group";
+import { JenkinsGroupService } from '../../services/jenkins-group.service'
+
+
+@Component({
+  selector: 'app-jenkins-jobs',
+  templateUrl: './jenkins-jobs.component.html',
+})
+export class JenkinsJobsComponent implements OnInit {
+  @Input() jenkinsGroup: JenkinsGroup;
+  @Input() refreshGrpahTrigger: number;
+
+  jenkinsJobList: JenkinsJob[];
+  selectJenkinsJob: JenkinsJob;
+  tabSelected: string = "jobs";
+
+
+  constructor(
+    private jenkinsJobServices: JenkinsJobService,
+    private jenkinsGroupService: JenkinsGroupService,
+  ) {
+    this.selectJenkinsJob = new JenkinsJob();
+    this.refreshGrpahTrigger = 0;
+  }
+
+  ngOnInit(): void {
+    this.jenkinsJobServices.getJenkinsJobs(this.jenkinsGroup.id).then(
+      jobs => this.jenkinsJobList = jobs
+    );
+  }
+
+  editJob(job: JenkinsJob): void {
+    this.selectJenkinsJob = job;
+  }
+
+  saveJob(): void {
+    if (!this.selectJenkinsJob.id) {
+      this.selectJenkinsJob.jenkins_group_id = this.jenkinsGroup.id;
+      this.jenkinsJobServices.createJenkinsJob(this.selectJenkinsJob)
+        .then(job => {
+          this.jenkinsJobList.push(job);
+          this.selectJenkinsJob = new JenkinsJob();
+          this.refreshGraph();
+        })
+    } else {
+      this.jenkinsJobServices.updateJenkinsJob(this.selectJenkinsJob)
+        .then(job => {
+          this.selectJenkinsJob = job;
+          this.selectJenkinsJob = new JenkinsJob();
+          this.refreshGraph();
+        })
+    }
+  }
+
+  deleteJob(job: JenkinsJob): void {
+    if(confirm("Are you sure to delete job "+job.name)) {
+      this.jenkinsJobServices.deleteJenkinsJob(job)
+        .then(() => {
+          this.jenkinsJobList = this.jenkinsJobList.filter(j => j !== job);
+          this.refreshGraph();
+        });
+    }
+  }
+
+  updateWebHooks(): void {
+    this.jenkinsGroupService.updateJenkinsGroupWebhooks(this.jenkinsGroup.id)
+      .then(() => {})
+  }
+
+  selectTab(tabName: string): void {
+    this.tabSelected = tabName;
+  }
+
+  private refreshGraph() {
+    this.refreshGrpahTrigger += 1;
+  }
+}

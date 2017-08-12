@@ -5,19 +5,19 @@ import { zoom } from 'd3-zoom';
 import { JenkinsJob } from "../../../models/jenkins-job";
 
 @Component({
-  selector: 'app-jenins-group-graph-widget',
+  selector: 'app-jenkins-jobs-graph-widget',
   template: '<div id="graph-widget-id" class="graph-widget"></div>',
-  styleUrls: ['./jenkins-group-graph-widget.components.css'],
+  styleUrls: ['./jenkins-jobs-graph-widget.components.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class JenkinsGroupGraphWidgetComponent implements OnDestroy, OnChanges {
+export class JenkinsJobsGraphWidgetComponent implements OnDestroy, OnChanges {
   private parentNativeElement: any;
   private width = 800;
   private height = 400;
   private svg;
   private treeData: any;
   @Input() jenkinsJobList: JenkinsJob[];
-  @Input() refreshTrigger: number;
+  @Input() refreshGrpahTrigger: number;
 
   constructor(element: ElementRef) {
     this.parentNativeElement = element.nativeElement;

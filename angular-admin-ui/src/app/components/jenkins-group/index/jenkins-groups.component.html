@@ -62,8 +62,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let group of jenkinsGroupList">
-                <td>{{group.id}}</td>
-                <td>{{group.name}}</td>
+                <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.id}} </a></td>
+                <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.name}} </a></td>
                 <td>{{group.jobs_base_path}}</td>
                 <td>
                   <a [routerLink]="['/jenkins-groups', group.id]"> Edit </a>

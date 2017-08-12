@@ -1,7 +1,7 @@
 host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
-server_url: http://gitlab.example.local:8000 #server url for hooks (need for auto create webhooks)
+server_url: http://jenkins-gitlab-integrator.example.local:8000 #server url for hooks (need for auto create webhooks)
 gitlab_webhook_token: adEleRYsiViB1_34 #token for auth gitlab webhooks (Secret Token, Private-Token header)
 
 #generate secret

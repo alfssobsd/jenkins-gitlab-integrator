@@ -13,9 +13,10 @@ import { ConfigService } from './services/config.service';
 import { JenkinsGroupService } from './services/jenkins-group.service';
 import { JenkinsGroupsComponent } from './components/jenkins-group/index/jenkins-groups.component';
 import { JenkinsGroupEditComponent } from './components/jenkins-group/edit/jenkins-group-edit.component';
-import { JenkinsGroupGraphWidgetComponent } from './components/jenkins-group/graph-widget/jenkins-group-graph-widget.components';
+import { JenkinsJobsGraphWidgetComponent } from './components/jenkins-jobs/graph-widget/jenkins-jobs-graph-widget.components';
 // jenkins jobs
 import { JenkinsJobService } from "./services/jenkins-job.service"
+import { JenkinsJobsComponent } from "./components/jenkins-jobs/jenkins-jobs.component"
 
 // delayed task
 import { DelayedTasksComponent } from './components/delayed-task/index/delayed-tasks.component';
@@ -45,7 +46,8 @@ import { AppRoutingModule } from './app-routing.module';
     KeysPipe,
     JenkinsGroupsComponent,
     JenkinsGroupEditComponent,
-    JenkinsGroupGraphWidgetComponent,
+    JenkinsJobsGraphWidgetComponent,
+    JenkinsJobsComponent,
     LoginComponent,
     AlertComponent
   ],
