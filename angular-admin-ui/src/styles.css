@@ -173,3 +173,10 @@ section .content-body {
   -moz-transition: 800ms;
   -o-transition: 800ms;
 }
+
+
+/* ng toasty */
+#toasty.toasty-position-top-right {
+  top: 55px;
+  right: 12px;
+}

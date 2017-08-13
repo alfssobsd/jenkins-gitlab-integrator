@@ -2,9 +2,11 @@ import 'rxjs/add/operator/switchMap';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location }                 from '@angular/common';
+import { ToastyService }            from "ng2-toasty";
 
 import { JenkinsGroup } from '../../../models/jenkins-group'
 import { JenkinsGroupService } from '../../../services/jenkins-group.service'
+
 
 @Component({
   selector: 'app-jenkins-group-edit',
@@ -16,8 +18,9 @@ export class JenkinsGroupEditComponent implements OnInit {
 
   constructor(
     private jenkinsGroupService:JenkinsGroupService,
+    private toastyService:ToastyService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
   ) { }
 
   ngOnInit() {
@@ -28,7 +31,10 @@ export class JenkinsGroupEditComponent implements OnInit {
 
   save(): void {
     this.jenkinsGroupService.updateJenkinsGroup(this.jenkinsGroup.id, this.jenkinsGroup)
-      .then(group => this.jenkinsGroup = group)
+      .then(group => {
+        this.jenkinsGroup = group;
+        this.toastyService.success("Group " + group.name + " is updated");
+      })
   }
 
   goBack(): void {

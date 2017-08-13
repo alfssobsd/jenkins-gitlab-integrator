@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router }            from '@angular/router';
+import { ToastyService }     from "ng2-toasty";
 
 import { JenkinsGroup } from '../../../models/jenkins-group'
 import { JenkinsGroupService } from '../../../services/jenkins-group.service'
+
 
 @Component({
   selector: 'app-jenkins-groups',
@@ -15,6 +17,7 @@ export class JenkinsGroupsComponent implements OnInit {
 
   constructor(
     private jenkinsGroupService:JenkinsGroupService,
+    private toastyService:ToastyService,
     private router: Router,
   ) {
     this.newJenkinsGroup = new JenkinsGroup();
@@ -34,7 +37,10 @@ export class JenkinsGroupsComponent implements OnInit {
 
   create() {
     this.jenkinsGroupService.createJenkinsGroup(this.newJenkinsGroup)
-      .then(group => { this.router.navigate(['jenkins-groups', group.id]) })
+      .then(group => {
+        this.toastyService.success("Group " + group.name + " is created");
+        this.router.navigate(['jenkins-groups', group.id]);
+      })
   }
 
   delete(group: JenkinsGroup) {
@@ -42,6 +48,7 @@ export class JenkinsGroupsComponent implements OnInit {
       this.jenkinsGroupService.deleteJenkinsGroup(group.id)
       .then(() => {
         this.jenkinsGroupList = this.jenkinsGroupList.filter(g => g !== group);
+        this.toastyService.success("Group " + group.name + " is deleted");
       });
     }
   }

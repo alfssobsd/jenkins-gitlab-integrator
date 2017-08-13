@@ -2,6 +2,8 @@ import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
 import { HttpModule }    from '@angular/http';
+import { ToastyModule }  from 'ng2-toasty';
+import { D3Service }     from 'd3-ng2-service';
 
 // companents
 import { AppComponent }  from './app.component';
@@ -27,7 +29,6 @@ import { AuthGuard } from './guards/auth.guard'
 // common services
 import { AuthenticationService }  from './services/authentication.service';
 import { AlertService }           from './services/alert.service';
-import { D3Service }              from 'd3-ng2-service';
 // common components
 import { LoginComponent }         from './components/login/login.component';
 import { AlertComponent }         from './components/alert/alert.component';
@@ -53,6 +54,7 @@ import { AppRoutingModule } from './app-routing.module';
   ],
   imports: [
     BrowserModule,
+    ToastyModule.forRoot(),
     FormsModule,
     HttpModule,
     AppRoutingModule

@@ -1,8 +1,10 @@
 import { Component, Input, OnInit, SimpleChange,  SimpleChanges } from '@angular/core';
+import { ToastyService } from "ng2-toasty";
 import { JenkinsJob } from "../../models/jenkins-job";
 import { JenkinsJobService } from "../../services/jenkins-job.service";
 import { JenkinsGroup } from "../../models/jenkins-group";
 import { JenkinsGroupService } from '../../services/jenkins-group.service'
+
 
 
 @Component({
@@ -21,6 +23,7 @@ export class JenkinsJobsComponent implements OnInit {
   constructor(
     private jenkinsJobServices: JenkinsJobService,
     private jenkinsGroupService: JenkinsGroupService,
+    private toastyService:ToastyService,
   ) {
     this.selectJenkinsJob = new JenkinsJob();
     this.refreshGrpahTrigger = 0;
@@ -44,14 +47,18 @@ export class JenkinsJobsComponent implements OnInit {
           this.jenkinsJobList.push(job);
           this.selectJenkinsJob = new JenkinsJob();
           this.refreshGraph();
+          this.toastyService.success("Job " + job.name + " is created");
         })
+        .catch(err => console.log(err))
     } else {
       this.jenkinsJobServices.updateJenkinsJob(this.selectJenkinsJob)
         .then(job => {
           this.selectJenkinsJob = job;
           this.selectJenkinsJob = new JenkinsJob();
           this.refreshGraph();
+          this.toastyService.success("Job " + job.name + " is updated");
         })
+        .catch(err => console.log(err))
     }
   }
 
@@ -61,13 +68,16 @@ export class JenkinsJobsComponent implements OnInit {
         .then(() => {
           this.jenkinsJobList = this.jenkinsJobList.filter(j => j !== job);
           this.refreshGraph();
+          this.toastyService.success("Job " + job.name + " is deleted");
         });
     }
   }
 
   updateWebHooks(): void {
     this.jenkinsGroupService.updateJenkinsGroupWebhooks(this.jenkinsGroup.id)
-      .then(() => {})
+      .then(() => {
+        this.toastyService.success("all webhooks updated");
+      })
   }
 
   selectTab(tabName: string): void {
