@@ -10,6 +10,10 @@ _MERGE_REQUEST_COMMENTS = "%(base_url)s/api/v4/projects/%(project_id)d/merge_req
 _MERGE_REQUEST_COMMENT = "%(base_url)s/api/v4/projects/%(project_id)d/merge_requests/%(merge_id)d/notes/%(comment_id)d"
 
 
+class GitLabProjectNotFound(Exception):
+    """Requested record in database was not found"""
+    pass
+
 class GitLabMergeState(enum.Enum):
     OPENED = 1  # check and create task
     REOPENED = 2  # check and create task
@@ -167,6 +171,10 @@ class GitLabClient(LoggingMixin):
 
         data, status = await self._get_request(url)
         self._logging_info("status = %d" % status)
+
+        if status == 404:
+            msg = "Project id: {} does not exists"
+            raise GitLabProjectNotFound(msg.format(project_id))
 
         webhooks = list()
         for item in data:

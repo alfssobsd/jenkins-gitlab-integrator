@@ -7,7 +7,9 @@ from server.core.common import LoggingMixin
 from server.core.json_encoders import CustomJSONEncoder
 from server.core.models.jenkins_jobs import JenkinsJob
 from server.core.security.policy import require_permission, Permission
-from server.core.views import create_jenkins_job_manager, set_log_marker
+from server.core.views.api.mixins import WebHookApiMixin
+from server.core.views import create_jenkins_group_manager, create_jenkins_job_manager, set_log_marker, \
+    create_gitlab_client
 
 
 class AdminApiV1JenkinsJobListView(web.View, LoggingMixin):
@@ -24,7 +26,7 @@ class AdminApiV1JenkinsJobListView(web.View, LoggingMixin):
         return web.json_response(jobs, dumps=partial(json.dumps, cls=CustomJSONEncoder))
 
 
-class AdminApiV1JenkinsJobView(web.View, LoggingMixin):
+class AdminApiV1JenkinsJobView(web.View, LoggingMixin, WebHookApiMixin):
     """
         Admin API for mangmanet Jenkins Job
     """
@@ -86,7 +88,45 @@ class AdminApiV1JenkinsJobView(web.View, LoggingMixin):
 
     @set_log_marker
     @create_jenkins_job_manager
+    @create_jenkins_group_manager
+    @create_gitlab_client
     @require_permission(Permission.ADMIN_UI)
     async def delete(self):
+        #delete webhook
+        job = await self.jenkins_job_manager.get(self.request.match_info['id'])
+        group = await self.jenkins_group_manager.get(job.jenkins_group_id)
+        await self._delete_job_webhook(group, job, ignore_errors=True)
+
+        #delete job
         job = await self.jenkins_job_manager.delete(self.request.match_info['id'])
+
+        return web.json_response({})
+
+class AdminApiV1JenkinsJobGitlabWebHookView(web.View, LoggingMixin, WebhookApiMixin):
+
+    @set_log_marker
+    @create_jenkins_job_manager
+    @create_jenkins_group_manager
+    @create_gitlab_client
+    @require_permission(Permission.ADMIN_UI)
+    async def delete(self):
+        #delete webhook
+        job = await self.jenkins_job_manager.get(self.request.match_info['id'])
+        group = await self.jenkins_group_manager.get(job.jenkins_group_id)
+        await self._delete_job_webhook(group, job, ignore_errors=True)
+
+        return web.json_response({})
+
+    @set_log_marker
+    @create_jenkins_job_manager
+    @create_jenkins_group_manager
+    @create_gitlab_client
+    @require_permission(Permission.ADMIN_UI)
+    async def put(self):
+        #delete webhook
+        job = await self.jenkins_job_manager.get(self.request.match_info['id'])
+        group = await self.jenkins_group_manager.get(job.jenkins_group_id)
+        await self._delete_job_webhook(group, job, ignore_errors=True)
+        await self._create_job_webhook(group, job)
+
         return web.json_response({})

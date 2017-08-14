@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ToastyConfig } from 'ng2-toasty';
+import { ToastyConfig, ToastyService } from 'ng2-toasty';
 
 import { Stat }        from './models/stat'
 import { StatsService } from './services/stats.service'
@@ -18,6 +18,7 @@ export class AppComponent  implements OnInit {
 
   constructor(
     private statsService: StatsService,
+    private toastyService:ToastyService,
     private router: Router,
     private toastyConfig: ToastyConfig
   ) {
@@ -31,5 +32,10 @@ export class AppComponent  implements OnInit {
     this.statsService
       .getStats()
       .then(stat => this.stat = stat)
+      .catch(err => this.errorMessage(err));
+  }
+
+  private errorMessage(error){
+    this.toastyService.error(error.statusText + " status: " + error.status)
   }
 }

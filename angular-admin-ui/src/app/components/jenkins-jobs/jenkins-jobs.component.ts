@@ -4,6 +4,8 @@ import { JenkinsJob } from "../../models/jenkins-job";
 import { JenkinsJobService } from "../../services/jenkins-job.service";
 import { JenkinsGroup } from "../../models/jenkins-group";
 import { JenkinsGroupService } from '../../services/jenkins-group.service'
+import { Stat } from '../../models/stat'
+import { StatsService } from '../../services/stats.service'
 
 
 
@@ -17,12 +19,14 @@ export class JenkinsJobsComponent implements OnInit {
 
   jenkinsJobList: JenkinsJob[];
   selectJenkinsJob: JenkinsJob;
+  stat: Stat;
   tabSelected: string = "jobs";
 
 
   constructor(
     private jenkinsJobServices: JenkinsJobService,
     private jenkinsGroupService: JenkinsGroupService,
+    private statsService: StatsService,
     private toastyService:ToastyService,
   ) {
     this.selectJenkinsJob = new JenkinsJob();
@@ -32,6 +36,11 @@ export class JenkinsJobsComponent implements OnInit {
   ngOnInit(): void {
     this.jenkinsJobServices.getJenkinsJobs(this.jenkinsGroup.id)
       .then(jobs => this.jenkinsJobList = jobs)
+      .catch(err => this.errorMessage(err));
+
+    this.statsService
+      .getStats()
+      .then(stat => this.stat = stat)
       .catch(err => this.errorMessage(err));
   }
 

@@ -1,5 +1,6 @@
 import uuid
 import json
+import logging
 
 from aiohttp import web
 
@@ -29,8 +30,10 @@ async def error_middleware(app, handler):
             response = await handler(request)
             return response
         except web.HTTPException as ex:
+            logging.exception(ex)
             return await handle_error(ex.reason, ex.status)
         except Exception as ex:
+            logging.exception(ex)
             return await handle_500(ex)
 
     return middleware_handler

@@ -18,10 +18,10 @@
               <th>webhook url</th>
               <th>actions</th>
             </thead>
-            <tbody>
-              <tr *ngFor="let job of jenkinsJobList">
+            <tbody *ngIf="stat">
+              <tr *ngFor="let job of jenkinsJobList" >
                 <td>{{job.name}}</td>
-                <td>http://host:port/gitlab/group/{{jenkinsGroup.name}}/job/{{ job.name }}</td>
+                <td>{{ stat.server_url }}/gitlab/group/{{jenkinsGroup.name}}/job/{{ job.name }}</td>
                 <td>
                   <a (click)="updateWebHooks()"  href="javascript:void(0)"> Update </a>
                   <a (click)="updateWebHooks()"  href="javascript:void(0)"> Delete </a>
