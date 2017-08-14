@@ -90,7 +90,7 @@ class AdminApiV1JenkinsGroupView(web.View, LoggingMixin, WebHookApiMixin):
         group = await self.jenkins_group_manager.get(self.request.match_info['id'])
         jobs = await  self.jenkins_job_manager.find_by_group_id(int(self.request.match_info['id']))
         for job in jobs:
-            await self._delete_job_webhook(group, job, inore_errors=True)
+            await self._delete_job_webhook(group, job, ignore_errors=True)
             await self.jenkins_job_manager.delete(job.id)
 
         group = await self.jenkins_group_manager.delete(self.request.match_info['id'])

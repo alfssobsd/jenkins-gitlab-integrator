@@ -14,7 +14,9 @@ from aiohttp_security import SessionIdentityPolicy
 from aiomysql.sa import create_engine
 from trafaret_config import commandline
 
+
 import server.middlewares as middlewares
+from server.cli_tool.common import init_example_data
 from server.core.views.api.admin_config import AdminApiV1ConfigView
 from server.core.views.api.admin_delayed_tasks import AdminApiV1DelayedTasksView, AdminApiV1DelayedTaskDetailView, \
     AdminApiV1DelayedTaskChangeStatusView
@@ -85,6 +87,7 @@ class RoutesMixin(object):
 class CommandLineOptionsMixin(object):
     def read_cmdline(self, argv):
         ap = argparse.ArgumentParser()
+        ap.add_argument('--init-example-data', action='store_true', help='init example data')
         commandline.standard_argparse_options(ap, default_config='./config/server.yml')
         return ap.parse_args(argv)
 
@@ -167,6 +170,13 @@ class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin
         self.setup_security()
         self.setup_routes()
         self.init_sa_tables()
+
+        if self.read_cmdline(argv).init_example_data:
+            self._cli_init_example_data(argv)
+        else:
+            self._server(argv)
+
+    def _server(self, argv):
         self.app['app_version'] = self.SERVER_VERSION
 
         self.app.middlewares.append(middlewares.error_middleware)
@@ -180,6 +190,12 @@ class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin
 
         web.run_app(self.app, host=self.app['config']['host'], port=self.app['config']['port'])
 
+
+    def _cli_init_example_data(self, argv):
+        logging.info('init example data')
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.init_connect_db(self.app))
+        loop.run_until_complete(init_example_data(self.app['db_pool'], self.app['sa_tables']))
 
 if __name__ == '__main__':
     server = Server(sys.argv[1:])

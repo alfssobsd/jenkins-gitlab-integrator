@@ -21,7 +21,7 @@ class JenkinsJob(object):
     def make(name, jenkins_group_id, jenkins_job_perent_id, gitlab_project_id):
         obj = JenkinsJob()
         obj.name = name
-        obj.jobs_base_path = jenkins_group_id
+        obj.jenkins_group_id = jenkins_group_id
         obj.jenkins_job_perent_id = jenkins_job_perent_id
         obj.gitlab_project_id = gitlab_project_id
 
