@@ -7,7 +7,7 @@ import { Config } from '../models/config'
 @Injectable()
 export class ConfigService {
   private headers = new Headers({'Content-Type': 'application/json'});
-  private configUrl = '/admin/api/v1/config';
+  private configUrl = '/api/admin/v1/config';
 
   constructor(private http: Http) {}
 

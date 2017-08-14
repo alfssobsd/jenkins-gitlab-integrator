@@ -1,33 +1,29 @@
 import enum
 import hashlib
-import json
+
 from sqlalchemy import desc
 
 from server.core.common import LoggingMixin
+from server.core.models import RecordNotFound
+
 
 class DelayedTaskStatus(enum.Enum):
     NEW = 1
     SUCCESS = 2
     CANCELED = 3
 
+
 class DelayedTaskType(enum.Enum):
     GITLAB_MERGE_REQ = 1
     GITLAB_PUSH = 2
 
-class RecordNotFound(Exception):
-    """Requested record in database was not found"""
-    pass
-
-class CustomEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, DelayedTask):
-            return o.values
-        return json.JSONEncoder.default(self, o)
 
 class DelayedTask(object):
     """Data class for DelayedTask"""
+
     def __init__(self):
         self.id = None
+        self.sha1 = None
         self._task_status = DelayedTaskStatus.NEW
         self._task_type = DelayedTaskType.GITLAB_PUSH
         self.group = None
@@ -75,14 +71,14 @@ class DelayedTask(object):
 
     @property
     def values(self):
-        result = {k: v for k, v in self.__dict__ .items() if not k.startswith('_')}
+        result = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         result['uniq_md5sum'] = self.uniq_md5sum
         result['task_type'] = self.task_type
         result['task_status'] = self.task_status
         return result
 
     def __repr__(self):
-        msg = "DelayedTask %s" % (self.values)
+        msg = "DelayedTask %s" % self.values
         return msg
 
     @staticmethod
@@ -107,6 +103,7 @@ class DelayedTask(object):
         obj.counter_attempts = 0
         return obj
 
+
 class DelayedTaskManager(LoggingMixin):
     """ Class for managment data in delayed_tasks table"""
 
@@ -115,19 +112,18 @@ class DelayedTaskManager(LoggingMixin):
         self.db_pool = db_pool
         self._delayed_tasks = tables['delayed_tasks']
 
-
-    async def search(self, task_type = None, task_status = None, group = None,
-            job_name = None, branch = None, sha1 = None, limit=150):
+    async def search(self, task_type=None, task_status=None, group=None,
+                     job_name=None, branch=None, sha1=None, limit=150):
         """
             Search delayed_tasks by fields
 
-            Args:
-                task_type - task type
-                task_status - task status
-                group  - group name
-                job_name - job_name
-                branch - branch
-                sha1  - sha1
+        Args:
+            task_type - task type
+            task_status - task status
+            group  - group name
+            job_name - job_name
+            branch - branch
+            sha1  - sha1
         Return:
             list[DelayedTask obj, DelayedTask obj]
 
@@ -136,7 +132,7 @@ class DelayedTaskManager(LoggingMixin):
                 and anower from sqlalchemy
         """
         self._logging_debug("Search: %s %s %s %s %s %s" % (task_type,
-                            task_status, group, job_name, branch, sha1))
+                                                           task_status, group, job_name, branch, sha1))
 
         colums = self._delayed_tasks.c
         async with self.db_pool.acquire() as conn:
@@ -189,9 +185,9 @@ class DelayedTaskManager(LoggingMixin):
             self._logging_debug(delayed_task.values)
             trans = await conn.begin()
             try:
-                q = self._delayed_tasks.insert().\
+                q = self._delayed_tasks.insert(). \
                     values(delayed_task.values)
-                result = await conn.execute(q)
+                await conn.execute(q)
                 await trans.commit()
                 self._logging_debug('Commit')
             except Exception as e:
@@ -256,7 +252,7 @@ class DelayedTaskManager(LoggingMixin):
             self._logging_debug(obj)
             return obj
 
-    async def get_by_status(self, task_status, limit = 150):
+    async def get_by_status(self, task_status, limit=150):
         """
         Get list DelayedTask by task_status
 
@@ -271,9 +267,9 @@ class DelayedTaskManager(LoggingMixin):
                 and anower from sqlalchemy
         """
         self._logging_debug("Get delayed_task with status: %s" % task_status.name)
-        return (await self.search(task_status = task_status.name))
+        return await self.search(task_status=task_status.name, limit=limit)
 
-    async def get_by_status_new(self, limit = 150):
+    async def get_by_status_new(self, limit=150):
         """
             Get list DelayedTask by task_status = NEW
             Args:
@@ -305,7 +301,7 @@ class DelayedTaskManager(LoggingMixin):
                 q = self._delayed_tasks.update(self._delayed_tasks.c.id == delayed_task_id).values(counter_attempts=0)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
@@ -329,10 +325,11 @@ class DelayedTaskManager(LoggingMixin):
         async with self.db_pool.acquire() as conn:
             trans = await conn.begin()
             try:
-                q = self._delayed_tasks.update(self._delayed_tasks.c.id == delayed_task_id).values(counter_attempts=self._delayed_tasks.c.counter_attempts + 1)
+                q = self._delayed_tasks.update(self._delayed_tasks.c.id == delayed_task_id).values(
+                    counter_attempts=self._delayed_tasks.c.counter_attempts + 1)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
@@ -359,14 +356,14 @@ class DelayedTaskManager(LoggingMixin):
                 self._logging_debug(q)
                 await conn.execute(q)
                 await trans.commit()
-            except Exception as e:
+            except Exception:
                 self._logging_debug('Rollback')
                 await trans.rollback()
                 raise
 
     async def set_gitlab_merge_comment_id(self, delayed_task_id, gitlab_merge_comment_id):
-        self._logging_debug("Set gitlab_merge_comment_id %d for delayed task with id: %d" \
-            % (gitlab_merge_comment_id, delayed_task_id))
+        self._logging_debug("Set gitlab_merge_comment_id %d for delayed task with id: %d"
+                            % (gitlab_merge_comment_id, delayed_task_id))
         await self.update_values(delayed_task_id, {'gitlab_merge_comment_id': gitlab_merge_comment_id})
 
     async def set_status(self, delayed_task_id, task_status):
@@ -435,7 +432,33 @@ class DelayedTaskManager(LoggingMixin):
         """
         await self.set_status(delayed_task_id, DelayedTaskStatus.CANCELED)
 
-    #private methods
+    async def delete(self, delayed_task_id):
+        """
+        Delete row
+
+        Args:
+            delayed_task_id - DelayedTask id
+
+        Return:
+            None
+
+        Exceptions:
+                pymysql.err
+                and anower from sqlalchemy
+        """
+        async with self.db_pool.acquire() as conn:
+            trans = await conn.begin()
+            try:
+                q = self._delayed_tasks.delete(self._delayed_tasks.c.id == delayed_task_id)
+                self._logging_debug(q)
+                await conn.execute(q)
+                await trans.commit()
+            except Exception:
+                self._logging_debug('Rollback')
+                await trans.rollback()
+                raise
+
+    # private methods
     def _columns(self):
         return self._delayed_tasks.c.keys()
 

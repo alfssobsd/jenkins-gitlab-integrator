@@ -1,7 +1,6 @@
-import asyncio
-import socket
 import json
 from functools import wraps
+
 from aiohttp import web
 from aiohttp.test_utils import unused_port
 
@@ -11,6 +10,7 @@ def http_method(method, path):
         func.__method__ = method
         func.__path__ = path
         return func
+
     return wrapper
 
 
@@ -49,21 +49,25 @@ def trace(path):
 def auth_gilab_token_required(func):
     @wraps(func)
     async def wrapper(*args):
-        if (args[-1].headers['Private-Token'] != 'test_token'):
+        if args[-1].headers['Private-Token'] != 'test_token':
             raise web.HTTPForbidden()
 
         return await func(*args)
+
     return wrapper
+
 
 def auth_basic_required(func):
     @wraps(func)
     async def wrapper(*args):
-        #user = username, password = password --> dXNlcm5hbWU6cGFzc3dvcmQ=
-        if (args[-1].headers['Authorization'] != 'Basic dXNlcm5hbWU6cGFzc3dvcmQ='):
+        # user = username, password = password --> dXNlcm5hbWU6cGFzc3dvcmQ=
+        if args[-1].headers['Authorization'] != 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=':
             raise web.HTTPForbidden()
 
         return await func(*args)
+
     return wrapper
+
 
 class FakeHTTPServer:
     def __init__(self, *, loop):

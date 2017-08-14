@@ -7,7 +7,7 @@ import { DelayedTask } from '../models/delayed-task'
 @Injectable()
 export class DelayedTaskService {
   private headers = new Headers({'Content-Type': 'application/json'});
-  private delayedTaskUrl = '/admin/api/v1/delayed-task';
+  private delayedTaskUrl = '/api/admin/v1/delayed-task';
 
   constructor(private http: Http) {}
 

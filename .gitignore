@@ -22,6 +22,12 @@ dist
 *.tmp*
 __pycache__
 dev_config
-server/static/angular_app
 *.iml
 .idea/
+!/angular-admin-ui/
+!/docker-compose.yml
+!/.editorconfig
+!/.gitignore
+!/Dockerfile
+!/README.md
+/server/static/

@@ -2,10 +2,12 @@ from aiohttp import web
 from server.core.common import LoggingMixin
 from . import set_log_marker
 
+
 class DebugView(web.View, LoggingMixin):
     """
         View for debug webhooks
     """
+
     @set_log_marker
     async def get(self):
         request = self.request

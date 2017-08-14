@@ -6,7 +6,7 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "../server/static/angular_app",
+      "outDir": "../server/static",
       "assets": [
         "assets",
         "favicon.ico"
@@ -19,6 +19,8 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/ng2-toasty/bundles/style-bootstrap.css",
         "styles.css"
       ],
       "scripts": [],

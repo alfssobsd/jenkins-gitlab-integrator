@@ -6,6 +6,7 @@ from server.core.models.delayed_tasks import DelayedTaskManager, DelayedTaskType
 from server.core.services.gitlab_push_service import GitLabPushService
 from server.core.services.gitlab_merge_service import GitLabMergeService
 
+
 class GitLabWorker(LoggingMixin):
     def __init__(self, app):
         self._marker = self._get_new_marker()
@@ -16,17 +17,17 @@ class GitLabWorker(LoggingMixin):
         self._workers_config = app['config']['workers']
 
         self._push_service = GitLabPushService(self._marker,
-                                                self._db_pool,
-                                                self._db_tables,
-                                                self._jenkins_config,
-                                                self._gitlab_config,
-                                                self._workers_config)
+                                               self._db_pool,
+                                               self._db_tables,
+                                               self._jenkins_config,
+                                               self._gitlab_config,
+                                               self._workers_config)
         self._merge_service = GitLabMergeService(self._marker,
-                                                    self._db_pool,
-                                                    self._db_tables,
-                                                    self._jenkins_config,
-                                                    self._gitlab_config,
-                                                    self._workers_config)
+                                                 self._db_pool,
+                                                 self._db_tables,
+                                                 self._jenkins_config,
+                                                 self._gitlab_config,
+                                                 self._workers_config)
         self._delayed_task_manager = DelayedTaskManager(self._marker, self._db_pool, self._db_tables)
 
     async def run(self):
@@ -51,7 +52,6 @@ class GitLabWorker(LoggingMixin):
 
     async def stop(self):
         self._logging_info("Stop")
-
 
     def _get_new_marker(self):
         return "gitlab-worker-" + uuid.uuid4().hex

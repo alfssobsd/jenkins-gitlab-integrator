@@ -15,12 +15,14 @@ build_docker:
 	find . -path '*/__pycache__/*' -delete
 	find . -type d -name '__pycache__' -empty -delete
 	find . -name '*.pyc' -delete
+	(cd angular-admin-ui && npm install && ng build -d /static/)
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:latest .
 
 build_docker_release:
 	find . -path '*/__pycache__/*' -delete
 	find . -type d -name '__pycache__' -empty -delete
 	find . -name '*.pyc' -delete
+	(cd angular-admin-ui && npm install && ng build --prod -d /static/)
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:latest .
 	docker build -f Dockerfile  -t alfss/jenkins-gitlab-integrator:${VERSION} .
 

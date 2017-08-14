@@ -1,6 +1,6 @@
-from aiohttp import web
 from .common import *
 from .jenkins_response import *
+
 
 class FakeJenkinsServer(FakeHTTPServer):
     @post('/job/{group_folder}/job/{job_name}/job/{branch}/build')
@@ -26,13 +26,13 @@ class FakeJenkinsServer(FakeHTTPServer):
         if job_name == 'job_first':
             result = "SUCCESS"
             fixture = generate_last_successful_build(base_url, group_folder, job_name, branch, build_number,
-                                                  upstream_job_name, upstream_build_number, repo_url, result)
+                                                     upstream_job_name, upstream_build_number, repo_url, result)
         elif job_name == 'job_second':
             result = "SUCCESS"
             upstream_job_name = "job_first"
             upstream_build_number = 1
             fixture = generate_last_successful_build(base_url, group_folder, job_name, branch, build_number,
-                                                  upstream_job_name, upstream_build_number, repo_url, result)
+                                                     upstream_job_name, upstream_build_number, repo_url, result)
         else:
             raise web.HTTPNotFound(text="404 Not Found")
         return web.json_response(fixture)
@@ -47,4 +47,3 @@ class FakeJenkinsServer(FakeHTTPServer):
             return web.json_response({"_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob", "actions": []})
         else:
             raise web.HTTPNotFound(text="404 Not Found")
-

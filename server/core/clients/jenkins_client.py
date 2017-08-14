@@ -1,17 +1,18 @@
 import aiohttp
 from server.core.common import LoggingMixin
 
-
 _JOB_FULL_PATH = '%(job_base_path)s/job/%(job_name)s/job/%(branch)s'
 _JOB_INFO = '%(job_full_path)s/api/json?depth=0'
-#BUILD_INFO = '%(job_full_path)s/%(number)d/api/json'
+# BUILD_INFO = '%(job_full_path)s/%(number)d/api/json'
 _LAST_SUCCESS_BUILD_INFO = '%(job_full_path)s/lastSuccessfulBuild/api/json'
 _BUILD_JOB = '%(job_full_path)s/build'
+
 
 class JenkinsBuildInfo(object):
     """
         Data class for job build info
     """
+
     def __init__(self):
         self.number = 0
         self.upsteram_build_number = None
@@ -56,13 +57,13 @@ class JenkinsClient(LoggingMixin):
         Exceptions:
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
-        URL = self._job_url(_BUILD_JOB,
-            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
-        self._logging_info("url=%s" % URL)
+        job_url = self._job_url(_BUILD_JOB,
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+        self._logging_info("url=%s" % job_url)
         data = aiohttp.FormData()
         data.add_field('json', '{"parameter": []}', content_type='text/plain')
 
-        response_data, response_status = await self._post_form_request(URL, data)
+        response_data, response_status = await self._post_form_request(job_url, data)
         self._logging_info("status = %d" % response_status)
 
         return response_data
@@ -84,11 +85,11 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientResponseError - no successful build or job not exist
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
-        URL = self._job_url(_LAST_SUCCESS_BUILD_INFO,
-            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
-        self._logging_info("url=%s" % URL)
+        job_url = self._job_url(_LAST_SUCCESS_BUILD_INFO,
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+        self._logging_info("url=%s" % job_url)
 
-        response_data, response_status = await self._get_request_json(URL)
+        response_data, response_status = await self._get_request_json(job_url)
         self._logging_info("status = %d" % response_status)
 
         return self._parse_build_info(response_data, repo_remote_url)
@@ -109,18 +110,17 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientResponseError - job not exist
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
-        URL = self._job_url(_JOB_INFO,
-            **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
-        self._logging_info("url=%s" % URL)
+        job_url = self._job_url(_JOB_INFO,
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+        self._logging_info("url=%s" % job_url)
 
-        response_data, response_status = await self._get_request_json(URL)
+        response_data, response_status = await self._get_request_json(job_url)
         self._logging_info("status = %d" % response_status)
 
         return response_data
 
-
-    #pirvet methods
-    def _job_url(self, url_template ,**kw):
+    # pirvet methods
+    def _job_url(self, url_template, **kw):
         """
         Make API url
 
@@ -144,14 +144,15 @@ class JenkinsClient(LoggingMixin):
         Return:
             URL
         """
-        return _JOB_FULL_PATH % { 'job_base_path': job_base_path, 'job_name': job_name, 'branch': branch}
+        return _JOB_FULL_PATH % {'job_base_path': job_base_path, 'job_name': job_name, 'branch': branch}
 
-    async def _get_request_json(self, URL):
+    async def _get_request_json(self, url):
         """
         HTTP GET json
 
         Args:
-            URL
+            url
+
         Return:
             response data
             http code
@@ -161,19 +162,19 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         async with aiohttp.ClientSession(auth=self.basic_auth, loop=self.loop) as session:
-            async with session.get(URL) as resp:
+            async with session.get(url) as resp:
                 response_data = await resp.json()
-                self._logging_info("status=%d" % (resp.status))
-                self._logging_debug("response_data=%s" % (response_data))
+                self._logging_info("status=%d" % resp.status)
+                self._logging_debug("response_data=%s" % response_data)
 
                 return response_data, resp.status
 
-    async def _post_form_request(self, URL, data):
+    async def _post_form_request(self, url, data):
         """
         HTTP POST FROM
 
         Args:
-            URL
+            url
             data
 
         Return:
@@ -185,20 +186,21 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         async with aiohttp.ClientSession(auth=self.basic_auth, loop=self.loop) as session:
-            async with session.post(URL, data=data) as resp:
+            async with session.post(url, data=data) as resp:
                 response_data = await resp.text()
-                self._logging_info("status=%d" % (resp.status))
-                self._logging_debug("send=%s" % (data))
-                self._logging_debug("response_data=%s" % (response_data))
+                self._logging_info("status=%d" % resp.status)
+                self._logging_debug("send=%s" % data)
+                self._logging_debug("response_data=%s" % response_data)
 
                 return response_data, resp.status
 
-    async def _post_request_json(self, URL, data):
+    async def _post_request_json(self, url, data):
         """
         HTTP POST JSON
 
         Args:
-            URL
+            url
+
         Return:
             response data
             http code
@@ -208,11 +210,11 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         async with aiohttp.ClientSession(auth=self.basic_auth, loop=self.loop) as session:
-            async with session.post(URL, json=data) as resp:
+            async with session.post(url, json=data) as resp:
                 response_data = await resp.json()
-                self._logging_info("status=%d" % (resp.status))
-                self._logging_debug("send=%s" % (data))
-                self._logging_debug("response_data=%s" % (response_data))
+                self._logging_info("status=%d" % resp.status)
+                self._logging_debug("send=%s" % data)
+                self._logging_debug("response_data=%s" % response_data)
 
                 return response_data, resp.status
 
@@ -246,4 +248,3 @@ class JenkinsClient(LoggingMixin):
                             continue
 
         return build_info
-

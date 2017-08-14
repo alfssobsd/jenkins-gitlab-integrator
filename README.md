@@ -14,8 +14,6 @@ Menu:
   * [Install requirements libs](#usage_install_libs)
   * [Configure database schema](#usage_config_db)
   * [Configure server](#usage_config_server)
-  * [Example group config](#usage_example_group)
-  * [Example Gitlab webhook](#usage_gitlab_webhook)
   * [Exec server](#usage_exec_server)
   * [Admin UI](#usage_admin_ui)
   * [App stats](#usage_stats)
@@ -24,6 +22,7 @@ Menu:
   * [Prepare DB](#development_db)
   * [Libs](#development_libs)
   * [GitLab webhook processing](#development_gitlab_webhook)
+* [Thanks](#thanks)
 
 
 ## <a name="usage"></a> Usage
@@ -52,26 +51,18 @@ host: 0.0.0.0 # listen address
 port: 8000 # listen port
 log_level: INFO # log level
 
-#before usage you need generate secret key
+server_url: http://jenkins-gitlab-integrator.example.local:8000 #server url for gitlab webhooks (need for auto create webhooks)
+gitlab_webhook_token: adEleRYsiViB1_34 #token for auth gitlab webhooks (Secret Token, Private-Token header)
+
+#generate secret
 #from cryptography.fernet import Fernet
 #Fernet.generate_key()
-session_secret: N5I6xGINvJ6RigIwd_SX7nHM4J7zYc6ONx6MGH3F__o=
-
+session_secret: N5I6xGINvJ6RigIwd_SX7nHM4J7zYc6ONx6MGH3F__o= # salt for cookies
 #user list
 users:
   - username: root
     password: root
-    token: adEleRYsiViB
-    superuser: yes # Disable restrictions for this user
-
-  - username: gitlab_bot
-    password: gitlab_bot
-    token: adEleRYsiViB1_34 #token for api auth , gitlab Private-Token header !!! All token must be unique
-    permission: [GITLAB_HOOKS] # allow access to GITLAB_HOOKS
-
-  - username: admin
-    password: password
-    permission: [ADMIN_UI] # allow access to admin ui
+    permission: [ADMIN_UI]
 
 #mysql connection, same as alembic.ini
 mysql:
@@ -86,86 +77,18 @@ mysql:
 #gitlab api config
 gitlab:
   url: https://gitlab.example.local #gitlab url
-  access_token: xc3PXwfWxaKMdAM8yyzc #gitlab user api token (look to gitlab docs)
+  access_token: adEleRYsiViB #gitlab user api token (look to gitlab docs)
 
 #background workers config
 workers:
   enable: yes #enable or disable run workers
-  max_attempts: 10000 # how many try for do task
+  max_attempts: 1400 # how many try for do task
   scan_timeout: 60 # period between task run
 
 jenkins: #settings for jenkins
-  user_id: sergey.kravchuk #jenkins user
-  api_token: 2342b01c0dceca0465d144e310893ba9 # jenkins api token
-  groups: # groups jobs
-    testproject: # name of group
-      jobs_base_path: https://jenkins.example.local/job/experments #base job path for group
-      first_job: testproject #first job for run
-      chains: #chains of jobs
-        default: #chain name
-          - testproject #job in chain
-          - testprojectendstep
-    test2:
-      jobs_base_path: https://jenkins.example.local/job/test2
-      first_job: test
-      chains:
-        default:
-          - test
-          - test2
+  user_id: sergei.kravchuk #jenkins user
+  api_token: 2342b01c03caaa0465d144e310893ba9 # jenkins api token
 ```
-
-### <a name="usage_example_group"></a> Example group config
-
-![simple build (pipeline multibranch)](docs/images/jenkins-integrator-config-simple.png)
-```
-  groups:
-    test:
-      jobs_base_path: https://jenkins.example.local/job/test
-      first_job: t1
-      chains:
-        default:
-          - t1
-          - t2
-          - t3
-```
-
-gitlab webhook `http://server:port/gitlab/group/test/job/t1` or
-
-`http://server:port/gitlab/group/test/job/t2` or
-
-`http://server:port/gitlab/group/test/job/t3`
-
-
-![star build (pipeline multibranch)](docs/images/jenkins-integrator-config-star.png)
-```
-  groups:
-    appd:
-      jobs_base_path: https://jenkins.example.local/job/appd
-      first_job: t1
-      chains:
-        d1:
-          - t1
-          - t2
-          - t3
-          - d1
-        d2:
-          - t1
-          - t2
-          - t3
-          - d2
-        d3:
-          - t1
-          - t2
-          - t3
-          - d3
-```
-
-gitlab webhook `http://server:port/gitlab/group/appd/job/{job_name}`
-
-### <a name="usage_gitlab_webhook"></a> Example Gitlab webhook
-
-![docs/images/gitlab-webhook-settings.png](docs/images/gitlab-webhook-settings.png)
-
 
 ### <a name="usage_exec_server"></a> Exec server
 
@@ -180,6 +103,11 @@ Run migrations
 docker run --rm -v /opt/jenkins-gitlab-integrator/config:/opt/app/config -it alfss/jenkins-gitlab-integrator:latest migrate
 ```
 
+Init example data
+```
+docker run --rm -v /opt/jenkins-gitlab-integrator/config:/opt/app/config -it alfss/jenkins-gitlab-integrator:latest init_example_data
+```
+
 Start server
 ```
 docker run -d -v /opt/jenkins-gitlab-integrator/config:/opt/app/config alfss/jenkins-gitlab-integrator:latest
@@ -192,20 +120,24 @@ Or you can make docker image with your config in /opt/app/config
 Admin UI provide:
  * management for delayed tasks
  * show current config & version
+ * manage jenkins groups (webhooks)
 
 ```
-Go to http://server:port/login
+Go to http://server:port/
 ```
+
+![ui example](docs/images/example-ui.gif)
 
 ### <a name="usage_stats"></a> App stats
 
-`http://server:port/stats` return json with stats.
+`http://server:port/api/v1/stats` return json with stats.
 
 ```
 {
     "coroutines_run": 2, # current execute coroutines
     "task_in_queue": 0, # count task with status new
-    "app_version": "1.0.0"
+    "app_version": "1.0.0",
+    "server_url": "http://jenkins-gitlab-integrator.example.local:8000"
 }
 ```
 
@@ -231,6 +163,12 @@ vim alembic.ini
 alembic -c config/alembic.ini upgrade head
 ```
 
+### Build UI
+```
+cd angular-admin-ui
+ng build --watch -d /static/
+```
+
 ### Run server
 ```
 python -m server.main -c /path/to/config/server.yml
@@ -242,6 +180,8 @@ make test
 ```
 
 ### <a name="development_libs"></a> Libs
+
+#### Python Libs
 * [https://github.com/aio-libs/aiohttp]
 * [https://github.com/aio-libs/aiomysql]
 * [http://alembic.zzzcomputing.com/en/latest/]
@@ -253,6 +193,8 @@ make test
 * [https://github.com/aio-libs/aiohttp-session]
 * [https://pypi.python.org/pypi/cryptography]
 
+#### UI Libs
+* [https://angular.io/]
 
 ### <a name="development_gitlab_webhook"></a> Gitlab webhook processing
 
@@ -265,3 +207,6 @@ make test
 ![merge processing](docs/images/jenkins-integrator-gitlab-webhook-merge.jpg)
 
 
+# <a name="thanks"></a> Thanks
+
+* Alex Zolotyh <aazolotyh@gmail.com>
