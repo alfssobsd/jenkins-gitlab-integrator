@@ -142,7 +142,7 @@ def auth_by_gitlab_token(func):
         finally:
             if not valid_token:
                 message = 'Incorrect X-Gitlab-Token'
-                raise web.HTTPUnauthorized(text=message)
+                raise web.HTTPUnauthorized(reason=message)
         return await func(*args)
 
     return wrapper
@@ -163,7 +163,7 @@ def require_permission(permission):
             has_perm = await check_permission(request, permission)
             if not has_perm:
                 message = 'You has no permission'
-                raise web.HTTPForbidden(text=message)
+                raise web.HTTPForbidden(reason=message)
             return await func(*args)
 
         return wrapped

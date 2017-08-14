@@ -2,6 +2,7 @@ import json
 from functools import partial
 
 from aiohttp import web
+from aiohttp.web_exceptions import HTTPConflict
 
 from server.core.common import LoggingMixin
 from server.core.json_encoders import CustomJSONEncoder
@@ -57,6 +58,10 @@ class AdminApiV1JenkinsJobView(web.View, LoggingMixin, WebHookApiMixin):
 
         obj.gitlab_project_id = int(json_data['gitlab_project_id'])
 
+        first_job = await self.jenkins_job_manager.find_first_by_group_id(group_id)
+        if first_job:
+            raise HTTPConflict(reason="only one job can be first")
+
         job = await self.jenkins_job_manager.create(obj)
 
         return web.json_response(job, dumps=partial(json.dumps, cls=CustomJSONEncoder))
@@ -80,6 +85,10 @@ class AdminApiV1JenkinsJobView(web.View, LoggingMixin, WebHookApiMixin):
             obj.jenkins_job_perent_id = None
 
         obj.gitlab_project_id = int(json_data['gitlab_project_id'])
+
+        first_job = await self.jenkins_job_manager.find_first_by_group_id(group_id)
+        if first_job.id == job_id:
+            raise HTTPConflict(reason="only one job can be first")
 
         self._logging_debug(obj.values)
         job = await self.jenkins_job_manager.update(obj)

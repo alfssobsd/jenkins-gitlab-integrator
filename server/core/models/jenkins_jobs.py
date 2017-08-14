@@ -133,7 +133,7 @@ class JenkinsJobManager(LoggingMixin):
         Exceptions:
                 pymysql.err
         """
-        self._logging_debug("Find first jenkins_job by jenkins_group_id: %d" % jenkins_group_id)
+        self._logging_debug("Find first jenkins_job by jenkins_group_id: %d" % int(jenkins_group_id))
 
         columns = self._jenkins_jobs.c
         async with self.db_pool.acquire() as conn:

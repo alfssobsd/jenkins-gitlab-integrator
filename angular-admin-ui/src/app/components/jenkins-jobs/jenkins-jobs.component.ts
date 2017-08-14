@@ -58,7 +58,7 @@ export class JenkinsJobsComponent implements OnInit {
           this.refreshGraph();
           this.toastyService.success("Job " + job.name + " is created");
         })
-        .catch(err => this.errorMessage(err));
+        .catch(err => { this.errorMessage(err) });
     } else {
       this.jenkinsJobServices.updateJenkinsJob(this.selectJenkinsJob)
         .then(job => {
@@ -118,6 +118,6 @@ export class JenkinsJobsComponent implements OnInit {
   }
 
   private errorMessage(error){
-    this.toastyService.error(error.statusText + " status: " + error.status)
+    this.toastyService.error("message: " + error.json().error + ", http_status: " + error.status)
   }
 }

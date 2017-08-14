@@ -58,6 +58,6 @@ export class JenkinsGroupsComponent implements OnInit {
   }
 
   private errorMessage(error){
-    this.toastyService.error(error.statusText + " status: " + error.status)
+    this.toastyService.error("message: " + error.json().error + ", http_status: " + error.status)
   }
 }
