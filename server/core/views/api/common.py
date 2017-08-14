@@ -2,6 +2,7 @@ import asyncio
 
 import aiohttp_security
 from aiohttp import web
+from aiohttp.web_exceptions import HTTPUnauthorized
 
 from server.core.common import LoggingMixin
 from server.core.models.delayed_tasks import DelayedTaskStatus
@@ -44,7 +45,7 @@ class LoginApiV1View(web.View, LoggingMixin):
             await aiohttp_security.remember(self.request, response, username)
             return web.json_response({'username': username})
 
-        return web.json_response({'message': 'Incorrect username or password'}, status=401)
+        raise HTTPUnauthorized(reason='Incorrect username or password')
 
     @set_log_marker
     async def delete(self):

@@ -165,6 +165,7 @@ class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin
         self.init_sa_tables()
         self.app['app_version'] = self.SERVER_VERSION
 
+        self.app.middlewares.append(middlewares.error_middleware)
         self.app.middlewares.append(middlewares.uuid_marker_request)
         self.app.on_startup.append(self.init_connect_db)
         self.app.on_cleanup.append(self.close_connect_db)

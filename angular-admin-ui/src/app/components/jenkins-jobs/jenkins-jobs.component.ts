@@ -30,9 +30,9 @@ export class JenkinsJobsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.jenkinsJobServices.getJenkinsJobs(this.jenkinsGroup.id).then(
-      jobs => this.jenkinsJobList = jobs
-    );
+    this.jenkinsJobServices.getJenkinsJobs(this.jenkinsGroup.id)
+      .then(jobs => this.jenkinsJobList = jobs)
+      .catch(err => this.errorMessage(err));
   }
 
   editJob(job: JenkinsJob): void {
@@ -49,7 +49,7 @@ export class JenkinsJobsComponent implements OnInit {
           this.refreshGraph();
           this.toastyService.success("Job " + job.name + " is created");
         })
-        .catch(err => console.log(err))
+        .catch(err => this.errorMessage(err));
     } else {
       this.jenkinsJobServices.updateJenkinsJob(this.selectJenkinsJob)
         .then(job => {
@@ -58,7 +58,7 @@ export class JenkinsJobsComponent implements OnInit {
           this.refreshGraph();
           this.toastyService.success("Job " + job.name + " is updated");
         })
-        .catch(err => console.log(err))
+        .catch(err => this.errorMessage(err));
     }
   }
 
@@ -69,7 +69,8 @@ export class JenkinsJobsComponent implements OnInit {
           this.jenkinsJobList = this.jenkinsJobList.filter(j => j !== job);
           this.refreshGraph();
           this.toastyService.success("Job " + job.name + " is deleted");
-        });
+        })
+        .catch(err => this.errorMessage(err));
     }
   }
 
@@ -78,6 +79,7 @@ export class JenkinsJobsComponent implements OnInit {
       .then(() => {
         this.toastyService.success("all webhooks updated");
       })
+      .catch(err => this.errorMessage(err));
   }
 
   selectTab(tabName: string): void {
@@ -86,5 +88,9 @@ export class JenkinsJobsComponent implements OnInit {
 
   private refreshGraph() {
     this.refreshGrpahTrigger += 1;
+  }
+
+  private errorMessage(error){
+    this.toastyService.error(error.statusText + " status: " + error.status)
   }
 }

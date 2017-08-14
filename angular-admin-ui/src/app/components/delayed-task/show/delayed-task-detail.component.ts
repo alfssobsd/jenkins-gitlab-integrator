@@ -33,11 +33,15 @@ export class DelayedTaskDetailComponent implements OnInit {
       .then(delayedTask => {
         this.delayedTask = delayedTask;
         this.toastyService.success("Task status is changed");
-      });
+      })
+      .catch(err => this.errorMessage(err));
   }
 
   goBack(): void {
     this.location.back();
   }
 
+  private errorMessage(error){
+    this.toastyService.error(error.statusText + " status: " + error.status)
+  }
 }

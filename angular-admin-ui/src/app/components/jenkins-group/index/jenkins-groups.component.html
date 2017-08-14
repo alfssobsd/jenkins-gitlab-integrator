@@ -24,7 +24,7 @@
           </div>
           <div class="form-group">
             <div class="col-md-offset-2 col-md-4">
-              <button (click)="create()" class="btn btn-primary">create</button>
+              <button (click)="createGroup()" class="btn btn-primary">createGroup</button>
             </div>
           </div>
         </form>
@@ -47,7 +47,7 @@
             </div>
             <div class="form-group">
               <div class="col-xs-offset-2 col-xs-4">
-                <button (click)="search()" class="btn btn-primary">Search</button>
+                <button (click)="searchGroup()" class="btn btn-primary">Search</button>
               </div>
             </div>
           </form>
@@ -67,7 +67,7 @@
                 <td>{{group.jobs_base_path}}</td>
                 <td>
                   <a [routerLink]="['/jenkins-groups', group.id]"> Edit </a>
-                  <a (click)="delete(group)" href="javascript:void(0)" > Delete </a>
+                  <a (click)="deleteGroup(group)" href="javascript:void(0)" > Delete </a>
                 </td>
               </tr>
             </tbody>

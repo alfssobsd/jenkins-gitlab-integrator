@@ -27,29 +27,37 @@ export class JenkinsGroupsComponent implements OnInit {
     this.jenkinsGroupService
       .searchJenkinsGroups(this.searchName)
       .then(groups => this.jenkinsGroupList = groups)
+      .catch(err => this.errorMessage(err));
   }
 
-  search() {
+  searchGroup() {
     this.jenkinsGroupService
       .searchJenkinsGroups(this.searchName)
       .then(groups => this.jenkinsGroupList = groups)
+      .catch(err => this.errorMessage(err));
   }
 
-  create() {
+  createGroup() {
     this.jenkinsGroupService.createJenkinsGroup(this.newJenkinsGroup)
       .then(group => {
         this.toastyService.success("Group " + group.name + " is created");
         this.router.navigate(['jenkins-groups', group.id]);
       })
+      .catch(err => this.errorMessage(err));
   }
 
-  delete(group: JenkinsGroup) {
+  deleteGroup(group: JenkinsGroup) {
     if(confirm("Are you sure to delete group "+group.name)) {
       this.jenkinsGroupService.deleteJenkinsGroup(group.id)
       .then(() => {
         this.jenkinsGroupList = this.jenkinsGroupList.filter(g => g !== group);
         this.toastyService.success("Group " + group.name + " is deleted");
-      });
+      })
+      .catch(err => this.errorMessage(err));
     }
+  }
+
+  private errorMessage(error){
+    this.toastyService.error(error.statusText + " status: " + error.status)
   }
 }

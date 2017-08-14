@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
           this.router.navigate([this.returnUrl]);
         },
         error => {
-          this.alertService.error(error.json().message);
+          this.alertService.error(error.json().error);
         });
   }
 }
