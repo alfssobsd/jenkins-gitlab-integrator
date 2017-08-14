@@ -5,8 +5,6 @@ import sys
 import base64
 import asyncio
 import pymysql
-import jinja2
-import aiohttp_jinja2
 import sqlalchemy as sa
 from aiohttp import web
 from aiohttp_session import setup as setup_session
@@ -16,16 +14,24 @@ from aiohttp_security import SessionIdentityPolicy
 from aiomysql.sa import create_engine
 from trafaret_config import commandline
 
+
 import server.middlewares as middlewares
+from server.cli_tool.common import init_example_data
+from server.core.views.api.admin_config import AdminApiV1ConfigView
+from server.core.views.api.admin_delayed_tasks import AdminApiV1DelayedTasksView, AdminApiV1DelayedTaskDetailView, \
+    AdminApiV1DelayedTaskChangeStatusView
+from server.core.views.api.admin_jenkins_group import AdminApiV1JenkinsGroupSearchView, AdminApiV1JenkinsGroupView, \
+    AdminApiV1JenkinsGroupGitlabWebHooksView
+from server.core.views.api.admin_jenkins_job import AdminApiV1JenkinsJobListView, AdminApiV1JenkinsJobView, \
+    AdminApiV1JenkinsJobGitLabWebHookView
+from server.core.views.api.common import StatsApiV1View, LoginApiV1View
 from server.utils import TRAFARET
 from .core.views.debug import DebugView
 from .core.views.gitlab import GitLabWebhookView
-from .core.views.common import LoginView, LogOutView, IndexView, StatsView
-from .core.views.admin import AdminIndexView
-from .core.views.admin_api import AdminApiV1ConfigView, AdminApiV1DelayedTasksView,\
- AdminApiV1DelayedTaskDetailView, AdminApiV1DelayedTaskChangeStatusView
+from .core.views.common import IndexUIView, IndexView
 from .core.workers.gitlab_worker import GitLabWorker
 from .core.security.policy import FileAuthorizationPolicy
+
 
 class SecurityMixnin(object):
     def setup_security(self):
@@ -33,45 +39,58 @@ class SecurityMixnin(object):
         setup_session(self.app, EncryptedCookieStorage(secret_key))
         setup_security(self.app, SessionIdentityPolicy(), FileAuthorizationPolicy(self.app['config']['users']))
 
-class JinjaMixin(object):
-    TEMPLATES_ROOT = pathlib.Path(__file__).parent / 'templates'
-
-    async def jinja_version_processor(self, request):
-        return {'app_version': request.app['app_version'] }
-
-    def setup_jinja(self):
-
-        aiohttp_jinja2.setup(self.app,
-                            context_processors=[self.jinja_version_processor,
-                                                aiohttp_jinja2.request_processor],
-                            loader=jinja2.FileSystemLoader(str(self.TEMPLATES_ROOT)))
 
 class RoutesMixin(object):
-
     PROJECT_ROOT = pathlib.Path(__file__).parent
 
     def setup_routes(self):
+        self.app['PROJECT_ROOT'] = self.PROJECT_ROOT
+        # ui
         self.app.router.add_get('/', IndexView, name='index')
-        self.app.router.add_get('/stats', StatsView, name='stats')
-        self.app.router.add_get('/login', LoginView, name='login')
-        self.app.router.add_post('/login', LoginView, name='login_post')
-        self.app.router.add_get('/logout', LogOutView, name='logout')
-        self.app.router.add_get('/admin', AdminIndexView, name='admin_index')
-        self.app.router.add_get('/admin/api/v1/config', AdminApiV1ConfigView, name='admin_api_v1_config')
-        self.app.router.add_get('/admin/api/v1/delayed-task', AdminApiV1DelayedTasksView, name='admin_api_v1_delayed_task')
-        self.app.router.add_get('/admin/api/v1/delayed-task/{id}', AdminApiV1DelayedTaskDetailView, name='admin_api_v1_delayed_task_view')
-        self.app.router.add_post('/admin/api/v1/delayed-task/{id}/status', AdminApiV1DelayedTaskChangeStatusView, name='admin_api_v1_delayed_task_status_view')
-        self.app.router.add_get('/admin/{path:.*}', AdminIndexView, name='admin_angular')
+        self.app.router.add_get('/ui/', IndexUIView, name='index_ui_root')
+        self.app.router.add_get('/ui/{path:.*}', IndexUIView, name='index_ui')
+        # api common
+        self.app.router.add_get('/api/v1/stats', StatsApiV1View)
+        self.app.router.add_post('/api/v1/login', LoginApiV1View)
+        self.app.router.add_delete('/api/v1/logout', LoginApiV1View)
+        # Config
+        self.app.router.add_get('/api/admin/v1/config', AdminApiV1ConfigView)
+        # DelayedTask
+        self.app.router.add_get('/api/admin/v1/delayed-task', AdminApiV1DelayedTasksView)
+        self.app.router.add_get('/api/admin/v1/delayed-task/{id}', AdminApiV1DelayedTaskDetailView)
+        self.app.router.add_post('/api/admin/v1/delayed-task/{id}/status', AdminApiV1DelayedTaskChangeStatusView)
+        # JenkinsGroup search
+        self.app.router.add_get('/api/admin/v1/jenkins-group', AdminApiV1JenkinsGroupSearchView)
+        # JenkinsGroup managment
+        self.app.router.add_post('/api/admin/v1/jenkins-group', AdminApiV1JenkinsGroupView)
+        self.app.router.add_get('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        self.app.router.add_put('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        self.app.router.add_delete('/api/admin/v1/jenkins-group/{id}', AdminApiV1JenkinsGroupView)
+        # JenkinsGroup hooks
+        self.app.router.add_put('/api/admin/v1/jenkins-group/{id}/hooks', AdminApiV1JenkinsGroupGitlabWebHooksView)
+        # JenkinsJobs managment
+        self.app.router.add_get('/api/admin/v1/jenkins-group/{group_id}/jenkins-job', AdminApiV1JenkinsJobListView)
+        self.app.router.add_post('/api/admin/v1/jenkins-group/{group_id}/jenkins-job', AdminApiV1JenkinsJobView)
+        self.app.router.add_get('/api/admin/v1/jenkins-group/{group_id}/jenkins-job/{id}', AdminApiV1JenkinsJobView)
+        self.app.router.add_put('/api/admin/v1/jenkins-group/{group_id}/jenkins-job/{id}', AdminApiV1JenkinsJobView)
+        self.app.router.add_delete('/api/admin/v1/jenkins-group/{group_id}/jenkins-job/{id}', AdminApiV1JenkinsJobView)
+        # JenkinsJobs hook
+        self.app.router.add_put('/api/admin/v1/jenkins-group/{group_id}/jenkins-job/{id}/hook', AdminApiV1JenkinsJobGitLabWebHookView)
+        self.app.router.add_delete('/api/admin/v1/jenkins-group/{group_id}/jenkins-job/{id}/hook', AdminApiV1JenkinsJobGitLabWebHookView)
+        #
         self.app.router.add_post('/debug/post/webhook', DebugView)
         self.app.router.add_get('/debug/get/webhook', DebugView)
         self.app.router.add_post('/gitlab/group/{group}/job/{job_name}', GitLabWebhookView)
         self.app.router.add_static('/static/', path=str(self.PROJECT_ROOT / 'static'), name='static')
 
+
 class CommandLineOptionsMixin(object):
     def read_cmdline(self, argv):
         ap = argparse.ArgumentParser()
+        ap.add_argument('--init-example-data', action='store_true', help='init example data')
         commandline.standard_argparse_options(ap, default_config='./config/server.yml')
         return ap.parse_args(argv)
+
 
 class ConfigMixin(object):
     def read_config(self, options):
@@ -97,7 +116,6 @@ class BackgroundWorkerMixin(object):
 
 
 class DBConnectorMixin(object):
-
     async def init_connect_db(self, app):
         app['config']['mysql']['autocommit'] = True
         engine = await create_engine(loop=app.loop, **app['config']['mysql'])
@@ -106,6 +124,7 @@ class DBConnectorMixin(object):
     async def close_connect_db(self, app):
         app['db_pool'].close()
         await app['db_pool'].wait_closed()
+
 
 class DBTablesMixin(object):
     def _get_mysql_creator(self):
@@ -137,23 +156,30 @@ class LoggerSetupMixin(object):
         logging.basicConfig(level=level, format='%(asctime)s:%(levelname)s:%(message)s')
 
 
-class Server(JinjaMixin, RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin,
-    DBTablesMixin, LoggerSetupMixin, BackgroundWorkerMixin, SecurityMixnin):
+class Server(RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBConnectorMixin,
+             DBTablesMixin, LoggerSetupMixin, BackgroundWorkerMixin, SecurityMixnin):
     """
     Server entrypoint
     """
-    SERVER_VERSION = "1.0.3"
+    SERVER_VERSION = "1.1.0"
 
     def __init__(self, argv):
         self.app = web.Application(loop=asyncio.get_event_loop())
         self.read_config(self.read_cmdline(argv))
         self.setup_root_logger()
-        self.setup_jinja()
         self.setup_security()
         self.setup_routes()
         self.init_sa_tables()
+
+        if self.read_cmdline(argv).init_example_data:
+            self._cli_init_example_data(argv)
+        else:
+            self._server(argv)
+
+    def _server(self, argv):
         self.app['app_version'] = self.SERVER_VERSION
 
+        self.app.middlewares.append(middlewares.error_middleware)
         self.app.middlewares.append(middlewares.uuid_marker_request)
         self.app.on_startup.append(self.init_connect_db)
         self.app.on_cleanup.append(self.close_connect_db)
@@ -164,6 +190,12 @@ class Server(JinjaMixin, RoutesMixin, CommandLineOptionsMixin, ConfigMixin, DBCo
 
         web.run_app(self.app, host=self.app['config']['host'], port=self.app['config']['port'])
 
+
+    def _cli_init_example_data(self, argv):
+        logging.info('init example data')
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.init_connect_db(self.app))
+        loop.run_until_complete(init_example_data(self.app['db_pool'], self.app['sa_tables']))
 
 if __name__ == '__main__':
     server = Server(sys.argv[1:])

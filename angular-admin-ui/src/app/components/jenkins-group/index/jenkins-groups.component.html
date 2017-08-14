@@ -1,0 +1,79 @@
+<div class="row">
+
+</div>
+
+<div class="row">
+  <div class="col-xs-12 col-lg-12">
+    <section class="box">
+      <header>
+        <h2 class="title pull-left">Create Jenkins Group</h2>
+      </header>
+      <dir class="content-body">
+        <form class="form-horizontal" autocomplete="off">
+          <div class="form-group">
+            <label class="col-md-2 control-label">name</label>
+            <div class="col-md-8">
+              <input [(ngModel)]="newJenkinsGroup.name" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label">jobs_base_path</label>
+            <div class="col-md-8">
+              <input [(ngModel)]="newJenkinsGroup.jobs_base_path" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="http://jenkins.exmaple.com/job/job_name">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-offset-2 col-md-4">
+              <button (click)="createGroup()" class="btn btn-primary">createGroup</button>
+            </div>
+          </div>
+        </form>
+      </dir>
+    </section>
+  </div>
+  <div class="col-xs-12 col-lg-12">
+    <section class="box">
+      <header>
+        <h2 class="title pull-left">Search Jenkins Groups</h2>
+      </header>
+      <div class="content-body">
+        <div class="row">
+          <form class="form-horizontal" autocomplete="off">
+            <div class="form-group">
+              <label class="col-xs-2 control-label">Name</label>
+              <div class="col-xs-8">
+                <input [(ngModel)]="searchName" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="Name">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-xs-offset-2 col-xs-4">
+                <button (click)="searchGroup()" class="btn btn-primary">Search</button>
+              </div>
+            </div>
+          </form>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>name</th>
+                <th>jobs_base_path</th>
+                <th>actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let group of jenkinsGroupList">
+                <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.id}} </a></td>
+                <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.name}} </a></td>
+                <td>{{group.jobs_base_path}}</td>
+                <td>
+                  <a [routerLink]="['/jenkins-groups', group.id]"> Edit </a>
+                  <a (click)="deleteGroup(group)" href="javascript:void(0)" > Delete </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

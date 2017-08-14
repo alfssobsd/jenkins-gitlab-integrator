@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router }            from '@angular/router';
+import { ToastyService }     from "ng2-toasty";
 
 import { DelayedTask } from '../../../models/delayed-task'
 import { DelayedTaskService } from '../../../services/delayed-task.service'
 
+
 @Component({
   selector: 'app-delayed-tasks',
   templateUrl: './delayed-tasks.component.html',
-  styleUrls: ['./delayed-tasks.component.css']
 })
 export class DelayedTasksComponent implements OnInit {
   delayedTasks: DelayedTask[];
@@ -18,7 +19,8 @@ export class DelayedTasksComponent implements OnInit {
     ];
 
   constructor(
-    private delayedTaskService: DelayedTaskService
+    private delayedTaskService: DelayedTaskService,
+    private toastyService:ToastyService,
   ) { }
 
   ngOnInit() {
@@ -26,13 +28,14 @@ export class DelayedTasksComponent implements OnInit {
     this.delayedTaskService
       .searchDelayedTasks(this.searchData)
       .then(tasks => this.delayedTasks = tasks)
+      .catch(err => this.errorMessage(err));
   }
 
   search() {
-    console.log(this.searchData)
     this.delayedTaskService
       .searchDelayedTasks(this.searchData)
       .then(tasks => this.delayedTasks = tasks)
+      .catch(err => this.errorMessage(err));
   }
 
 
@@ -43,5 +46,9 @@ export class DelayedTasksComponent implements OnInit {
     this.searchData.job_name = null;
     this.searchData.branch = null;
     this.searchData.sha1 = null;
+  }
+
+  private errorMessage(error){
+    this.toastyService.error("message: " + error.json().error + ", http_status: " + error.status)
   }
 }

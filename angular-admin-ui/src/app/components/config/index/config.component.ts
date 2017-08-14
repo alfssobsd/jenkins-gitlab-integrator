@@ -6,7 +6,6 @@ import { ConfigService } from '../../../services/config.service';
 @Component({
   selector: 'app-config',
   templateUrl: './config.component.html',
-  styleUrls: ['./config.component.css']
 })
 export class ConfigComponent implements OnInit {
   config: Config;

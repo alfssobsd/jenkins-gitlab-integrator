@@ -1,0 +1,21 @@
+<div class="container">
+  <form class="form-signin" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+    <h2 class="form-signin-heading">Please sign in</h2>
+    <alert></alert>
+    <div class="form-group"  [ngClass]="{ 'has-error': f.submitted && !username.valid }">
+      <label for="inputLogin" class="sr-only">Username</label>
+      <input type="text" name="username" class="form-control" [(ngModel)]="model.username" #username="ngModel" placeholder="username" required autofocus>
+      <div *ngIf="f.submitted && !username.valid" class="help-block">Username is required</div>
+    </div>
+    <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" name="password" class="form-control" placeholder="password" [(ngModel)]="model.password" #password="ngModel" required>
+       <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block">Sign in</button>
+    <div class="server-info">
+      jenkins-gitlab-integrator
+      <a href="https://github.com/alfss/jenkins-gitlab-integrator">---> code</a>
+    </div>
+  </form>
+</div>
