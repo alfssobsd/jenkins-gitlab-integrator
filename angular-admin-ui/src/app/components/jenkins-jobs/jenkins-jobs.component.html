@@ -11,7 +11,7 @@
       <div class="tab-content">
         <!-- webhooks tab -->
         <div class="tab-item top-buffer" *ngIf="tabSelected == 'webhooks'">
-          <a (click)="updateWebHooks()" class="btn btn-primary" href="javascript:void(0)"> Update WebHooks </a>
+          <a (click)="updateAllWebHooks()" class="btn btn-primary" href="javascript:void(0)"> Update WebHooks </a>
           <table class="table table-hover top-buffer">
             <thead>
               <th>name</th>
@@ -23,8 +23,8 @@
                 <td>{{job.name}}</td>
                 <td>{{ stat.server_url }}/gitlab/group/{{jenkinsGroup.name}}/job/{{ job.name }}</td>
                 <td>
-                  <a (click)="updateWebHooks()"  href="javascript:void(0)"> Update </a>
-                  <a (click)="updateWebHooks()"  href="javascript:void(0)"> Delete </a>
+                  <a (click)="updateWebHook(job)"  href="javascript:void(0)"> Update </a>
+                  <a (click)="deleteWebHook(job)"  href="javascript:void(0)"> Delete </a>
                 </td>
               </tr>
             </tbody>

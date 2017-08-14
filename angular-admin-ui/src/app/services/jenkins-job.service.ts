@@ -48,6 +48,25 @@ export class JenkinsJobService {
       .catch(this.handleError);
   }
 
+
+  updateJenkinsJobWebHook(job: JenkinsJob) {
+    const url = `${this.jenkinsGroupUrl}/${job.jenkins_group_id}/${this.jenkinsJobPartUrl}/${job.id}/hook`;
+
+    return this.http.put(url, job, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as string)
+      .catch(this.handleError);
+  }
+
+  deleteJenkinsJobWebHook(job: JenkinsJob) {
+    const url = `${this.jenkinsGroupUrl}/${job.jenkins_group_id}/${this.jenkinsJobPartUrl}/${job.id}/hook`;
+
+    return this.http.delete(url, new RequestOptions({ headers: this.headers }))
+      .toPromise()
+      .then(response => response.json() as string)
+      .catch(this.handleError);
+  }
+
   private handleError(error: any): Promise<any> {
     console.error('ERROR (JenkinsJob API)', error);
     return Promise.reject(error.message || error);

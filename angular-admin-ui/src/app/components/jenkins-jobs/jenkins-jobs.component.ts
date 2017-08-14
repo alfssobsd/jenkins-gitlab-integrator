@@ -83,12 +83,30 @@ export class JenkinsJobsComponent implements OnInit {
     }
   }
 
-  updateWebHooks(): void {
+  updateAllWebHooks(): void {
     this.jenkinsGroupService.updateJenkinsGroupWebhooks(this.jenkinsGroup.id)
       .then(() => {
         this.toastyService.success("all webhooks updated");
       })
       .catch(err => this.errorMessage(err));
+  }
+
+  updateWebHook(job: JenkinsJob): void {
+    this.jenkinsJobServices.updateJenkinsJobWebHook(job)
+      .then(() => {
+        this.toastyService.success("webhook (job: " + job.name + ") is updated");
+      })
+      .catch(err => this.errorMessage(err))
+  }
+
+  deleteWebHook(job: JenkinsJob): void {
+    if(confirm("Are you sure to delete webhook for job: "+job.name)) {
+      this.jenkinsJobServices.deleteJenkinsJobWebHook(job)
+        .then(() => {
+          this.toastyService.success("webhook (job: " + job.name + ") is deleted");
+        })
+        .catch(err => this.errorMessage(err))
+    }
   }
 
   selectTab(tabName: string): void {

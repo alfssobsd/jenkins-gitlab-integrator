@@ -102,7 +102,7 @@ class AdminApiV1JenkinsJobView(web.View, LoggingMixin, WebHookApiMixin):
 
         return web.json_response({})
 
-class AdminApiV1JenkinsJobGitlabWebHookView(web.View, LoggingMixin, WebhookApiMixin):
+class AdminApiV1JenkinsJobGitLabWebHookView(web.View, LoggingMixin, WebHookApiMixin):
 
     @set_log_marker
     @create_jenkins_job_manager
