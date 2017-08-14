@@ -126,6 +126,8 @@ Admin UI provide:
 Go to http://server:port/
 ```
 
+![ui example](docs/images/example-ui.gif)
+
 ### <a name="usage_stats"></a> App stats
 
 `http://server:port/api/v1/stats` return json with stats.
