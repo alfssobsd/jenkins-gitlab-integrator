@@ -145,7 +145,7 @@ class JenkinsJobManager(LoggingMixin):
             # get first row
             row = await result.fetchone()
             if row is None:
-                msg = "JenkinsGroup with jenkins_group_id: {} does not exists"
+                msg = "JenkinsJob with jenkins_group_id: {} does not exists"
                 raise RecordNotFound(msg.format(jenkins_group_id))
             obj = await self._mapping_row_to_obj(row)
             self._logging_debug(obj)
@@ -275,7 +275,7 @@ class JenkinsJobManager(LoggingMixin):
         Mapping row to JenkinsJob object
 
         Return:
-            JenkinsGroup object
+            JenkinsJob object
         """
         data_obj = JenkinsJob()
         for column in self._columns():

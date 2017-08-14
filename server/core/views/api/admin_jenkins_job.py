@@ -6,6 +6,7 @@ from aiohttp.web_exceptions import HTTPConflict
 
 from server.core.common import LoggingMixin
 from server.core.json_encoders import CustomJSONEncoder
+from server.core.models import RecordNotFound
 from server.core.models.jenkins_jobs import JenkinsJob
 from server.core.security.policy import require_permission, Permission
 from server.core.views.api.mixins import WebHookApiMixin
@@ -58,9 +59,12 @@ class AdminApiV1JenkinsJobView(web.View, LoggingMixin, WebHookApiMixin):
 
         obj.gitlab_project_id = int(json_data['gitlab_project_id'])
 
-        first_job = await self.jenkins_job_manager.find_first_by_group_id(group_id)
-        if first_job:
-            raise HTTPConflict(reason="only one job can be first")
+        try:
+            first_job = await self.jenkins_job_manager.find_first_by_group_id(group_id)
+            if first_job and obj.jenkins_job_perent_id is None:
+                raise HTTPConflict(reason="only one job can be first")
+        except RecordNotFound:
+            pass
 
         job = await self.jenkins_job_manager.create(obj)
 
@@ -87,7 +91,7 @@ class AdminApiV1JenkinsJobView(web.View, LoggingMixin, WebHookApiMixin):
         obj.gitlab_project_id = int(json_data['gitlab_project_id'])
 
         first_job = await self.jenkins_job_manager.find_first_by_group_id(group_id)
-        if first_job.id == job_id:
+        if not first_job.id == job_id:
             raise HTTPConflict(reason="only one job can be first")
 
         self._logging_debug(obj.values)
