@@ -1,7 +1,12 @@
 from .common import *
 
-
 class FakeGitLabServer(FakeHTTPServer):
+
+    def __init__(self, *, loop):
+        super(FakeGitLabServer, self).__init__(loop=loop)
+        self.STORE_WEBHOOKS = {1: list(), 2:list()}
+        self.STORE_WEBHOOKS_INDEX = 1
+
     @get('/api/v4/projects/{project_id}')
     @auth_gilab_token_required
     async def get_project(self, request):
@@ -96,3 +101,49 @@ class FakeGitLabServer(FakeHTTPServer):
             }
         }
         return web.json_response(fixture)
+
+    @get('/api/v4/projects/{project_id}/hooks')
+    @auth_gilab_token_required
+    async def get_webhooks(self, request):
+        project_id = int(request.match_info['project_id'])
+        return web.json_response(self.STORE_WEBHOOKS[project_id])
+
+    @post('/api/v4/projects/{project_id}/hooks')
+    @auth_gilab_token_required
+    async def create_webhook(self, request):
+        project_id = int(request.match_info['project_id'])
+        json_data = await request.json()
+
+        self.STORE_WEBHOOKS_INDEX += 1
+        fixture = {
+            "id": self.STORE_WEBHOOKS_INDEX,
+            "project_id": project_id,
+            "url": json_data['url'],
+            "push_events": json_data['push_events'],
+            "tag_push_events": json_data['push_events'],
+            "merge_requests_events": json_data['merge_requests_events'],
+            "enable_ssl_verification": json_data['enable_ssl_verification'],
+            "issues_events": False,
+            "note_events": False,
+            "pipeline_events": False,
+            "wiki_page_events": False,
+            "job_events":False,
+            "token": json_data['token'],
+            "created_at":"2017-08-14T14:32:49.797+03:00"
+        }
+
+        self.STORE_WEBHOOKS[project_id].append(fixture)
+        return web.json_response(fixture, status=201)
+
+    @delete('/api/v4/projects/{project_id}/hooks/{hook_id}')
+    @auth_gilab_token_required
+    async def delete_webhook(self, request):
+        project_id = int(request.match_info['project_id'])
+        hook_id = int(request.match_info['hook_id'])
+
+        for index, hook_item in enumerate(self.STORE_WEBHOOKS[project_id]):
+            if hook_item['id'] == hook_id:
+                del self.STORE_WEBHOOKS[project_id][index]
+                return web.json_response({}, status=204)
+
+        return web.json_response({}, status=500)

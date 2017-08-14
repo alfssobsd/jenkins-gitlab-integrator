@@ -112,7 +112,7 @@ class AdminApiV1JenkinsGroupGitlabWebHooksView(web.View, LoggingMixin, WebHookAp
         group = await self.jenkins_group_manager.get(self.request.match_info['id'])
         jobs = await self.jenkins_job_manager.find_by_group_id(int(self.request.match_info['id']))
         for job in jobs:
-            await self._delete_job_webhook(group, job, inore_errors=True)
+            await self._delete_job_webhook(group, job, ignore_errors=True)
             await self._create_job_webhook(group, job)
 
         return web.json_response({'message': 'Update GitLab webhooks'})
