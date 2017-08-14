@@ -14,8 +14,6 @@ Menu:
   * [Install requirements libs](#usage_install_libs)
   * [Configure database schema](#usage_config_db)
   * [Configure server](#usage_config_server)
-  * [Configure integration with GitLab (webhooks)](#usage_gitlab_integration)
-  * [Example Gitlab webhook](#usage_gitlab_webhook)
   * [Exec server](#usage_exec_server)
   * [Admin UI](#usage_admin_ui)
   * [App stats](#usage_stats)
@@ -92,24 +90,6 @@ jenkins: #settings for jenkins
   api_token: 2342b01c03caaa0465d144e310893ba9 # jenkins api token
 ```
 
-### <a name="usage_gitlab_integration"></a> Configure integration with GitLab (webhooks)
-
-All flows in jenkins combined in groups. if all `jobs` in group is success, `merge` will be marked is as successful
-
-Examples wokring flows:
-
-![simple build (pipeline multibranch)](docs/images/jenkins-integrator-config-simple.png)
-
-![star build (pipeline multibranch)](docs/images/jenkins-integrator-config-star.png)
-
-Go to http://server:port/ui/jenkins-groups for configure.
-
-
-### <a name="usage_gitlab_webhook"></a> Example Gitlab webhook
-
-![docs/images/gitlab-webhook-settings.png](docs/images/gitlab-webhook-settings.png)
-
-
 ### <a name="usage_exec_server"></a> Exec server
 
 Copy config to anower dirs and modify
@@ -121,6 +101,11 @@ cp config/server.yml /opt/jenkins-gitlab-integrator/config/
 Run migrations
 ```
 docker run --rm -v /opt/jenkins-gitlab-integrator/config:/opt/app/config -it alfss/jenkins-gitlab-integrator:latest migrate
+```
+
+Init example data
+```
+docker run --rm -v /opt/jenkins-gitlab-integrator/config:/opt/app/config -it alfss/jenkins-gitlab-integrator:latest init_example_data
 ```
 
 Start server
@@ -149,7 +134,8 @@ Go to http://server:port/
 {
     "coroutines_run": 2, # current execute coroutines
     "task_in_queue": 0, # count task with status new
-    "app_version": "1.0.0"
+    "app_version": "1.0.0",
+    "server_url": "http://jenkins-gitlab-integrator.example.local:8000"
 }
 ```
 
@@ -178,7 +164,7 @@ alembic -c config/alembic.ini upgrade head
 ### Build UI
 ```
 cd angular-admin-ui
-ng build -d /static/
+ng build --watch -d /static/
 ```
 
 ### Run server
