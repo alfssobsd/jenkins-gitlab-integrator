@@ -1,9 +1,12 @@
+import ujson
+
 import aiohttp
 from server.core.common import LoggingMixin
 
+_SINGLE_JOB_FULL_PATH = '%(job_base_path)s/job/%(job_name)s'
 _JOB_FULL_PATH = '%(job_base_path)s/job/%(job_name)s/job/%(branch)s'
 _JOB_INFO = '%(job_full_path)s/api/json?depth=0'
-# BUILD_INFO = '%(job_full_path)s/%(number)d/api/json'
+_BUILD_INFO = '%(job_full_path)s/%(number)d/api/json'
 _LAST_SUCCESS_BUILD_INFO = '%(job_full_path)s/lastSuccessfulBuild/api/json'
 _BUILD_JOB = '%(job_full_path)s/build'
 
@@ -42,7 +45,7 @@ class JenkinsClient(LoggingMixin):
         self._marker = marker
         self.basic_auth = aiohttp.BasicAuth(username, password)
 
-    async def build(self, job_base_path, job_name, branch):
+    async def build(self, job_base_path, job_name, branch, is_pipeline=True):
         """
         Start build in Jenkins
 
@@ -50,6 +53,7 @@ class JenkinsClient(LoggingMixin):
             job_base_path - base folder for mutibranch pipline job
             job_name - multibranch pipline job
             branch - name branch in pipline job
+            is_pipeline  - pipeline or not (True or False)
 
         Retrun:
             Raw response data
@@ -58,25 +62,67 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         job_url = self._job_url(_BUILD_JOB,
-                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch, is_pipeline)})
         self._logging_info("url=%s" % job_url)
+
+        build_parameter = { 'parameter':[] }
+
+        #set parameter branch if it not pipline job
+        if not is_pipeline:
+            build_parameter['parameter'].append({
+                    'name': 'branch',
+                    'value': branch
+                })
+
         data = aiohttp.FormData()
-        data.add_field('json', '{"parameter": []}', content_type='text/plain')
+        data.add_field('json', ujson.dumps(build_parameter), content_type='text/plain')
 
         response_data, response_status = await self._post_form_request(job_url, data)
         self._logging_info("status = %d" % response_status)
 
         return response_data
 
-    async def get_last_success_build(self, job_base_path, job_name, branch, repo_remote_url):
+    async def get_build_info(self, job_base_path, job_name, branch, repo_remote_url, build_number, is_pipeline=True):
         """
-        Get info about last succes job
+        Get info about build by number
 
         Args:
             job_base_path - base folder for mutibranch pipline job
             job_name - multibranch pipline job
             branch - name branch in pipline job
             repo_remote_url - repo url(for search sha1 hash)
+            build_number - build number
+            is_pipeline  - pipeline or not (True or False)
+
+        Retrun:
+            JenkinsBuildInfo object
+
+        Exceptions:
+            aiohttp.client_exceptions.ClientResponseError - no successful build or job not exist
+            aiohttp.client_exceptions.ClientConnectorError - problem connect
+        """
+
+        job_url = self._job_url(_BUILD_INFO,
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch, is_pipeline),
+                                    'build_number': build_number})
+
+        self._logging_info("url=%s" % job_url)
+
+        response_data, response_status = await self._get_request_json(job_url)
+        self._logging_info("status = %d" % response_status)
+
+        return self._parse_build_info(response_data, repo_remote_url)
+
+    async def get_last_success_build(self, job_base_path, job_name, branch, repo_remote_url, is_pipeline=True):
+        """
+        Get info about last succes build
+
+        Args:
+            job_base_path - base folder for mutibranch pipline job
+            job_name - multibranch pipline job
+            branch - name branch in pipline job
+            repo_remote_url - repo url(for search sha1 hash)
+            is_pipeline  - pipeline or not (True or False)
 
         Retrun:
             JenkinsBuildInfo object
@@ -86,7 +132,7 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         job_url = self._job_url(_LAST_SUCCESS_BUILD_INFO,
-                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch, is_pipeline)})
         self._logging_info("url=%s" % job_url)
 
         response_data, response_status = await self._get_request_json(job_url)
@@ -94,7 +140,7 @@ class JenkinsClient(LoggingMixin):
 
         return self._parse_build_info(response_data, repo_remote_url)
 
-    async def job_exists(self, job_base_path, job_name, branch):
+    async def job_exists(self, job_base_path, job_name, branch, is_pipeline=True):
         """
         Check existence job in jenkins
 
@@ -102,6 +148,7 @@ class JenkinsClient(LoggingMixin):
             job_base_path - base folder for mutibranch pipline job
             job_name - multibranch pipline job
             branch - name branch in pipline job
+            is_pipeline  - pipeline or not (True or False)
 
         Return:
             raw json object
@@ -111,7 +158,7 @@ class JenkinsClient(LoggingMixin):
             aiohttp.client_exceptions.ClientConnectorError - problem connect
         """
         job_url = self._job_url(_JOB_INFO,
-                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch)})
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch, is_pipeline)})
         self._logging_info("url=%s" % job_url)
 
         response_data, response_status = await self._get_request_json(job_url)
@@ -132,19 +179,23 @@ class JenkinsClient(LoggingMixin):
         """
         return url_template % kw
 
-    def _job_full_path(self, job_base_path, job_name, branch):
+    def _job_full_path(self, job_base_path, job_name, branch, is_pipeline=True):
         """
         Make full path to job
 
         Args:
-            job_base_path
-            job_name
-            branch
+            job_base_path - base path to job
+            job_name - job_name
+            branch - branch
+            is_pipeline  - pipeline or not (True or False)
 
         Return:
             URL
         """
-        return _JOB_FULL_PATH % {'job_base_path': job_base_path, 'job_name': job_name, 'branch': branch}
+        if is_pipeline:
+            return _JOB_FULL_PATH % {'job_base_path': job_base_path, 'job_name': job_name, 'branch': branch}
+
+        return _SINGLE_JOB_FULL_PATH % {'job_base_path': job_base_path, 'job_name': job_name}
 
     async def _get_request_json(self, url):
         """
