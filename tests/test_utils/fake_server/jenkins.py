@@ -43,7 +43,20 @@ class FakeJenkinsServer(FakeHTTPServer):
         group_folder = request.match_info['group_folder']
         job_name = request.match_info['job_name']
         branch = request.match_info['branch']
+        base_url = "http://%s:%d" % (self._server_addr, self._server_port)
+
         if job_name in ['job_first', 'job_second'] and branch in ['feature_4']:
-            return web.json_response({"_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob", "actions": []})
+            return web.json_response(generate_job_info(base_url, job_name))
+        else:
+            raise web.HTTPNotFound(text="404 Not Found")
+
+    @get('/job/{job_name}/api/json')
+    @auth_basic_required
+    async def get_single_job_info(self, request):
+        job_name = request.match_info['job_name']
+        base_url = "http://%s:%d" % (self._server_addr, self._server_port)
+
+        if job_name in ['job_first', 'job_second']:
+            return web.json_response(generate_job_info(base_url, job_name))
         else:
             raise web.HTTPNotFound(text="404 Not Found")

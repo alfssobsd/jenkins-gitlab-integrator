@@ -124,3 +124,27 @@ def generate_last_successful_build(base_url=None, group_folder=None, job_name=No
                 ]
             })
     return data
+
+
+def generate_job_info(base_url=None, job_name=None):
+    return {
+        "_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob",
+        "actions": [],
+        "builds" : [
+            {
+                '_class': "org.jenkinsci.plugins.workflow.job.WorkflowRun",
+                'number': 19,
+                'url': "%s/job/%s" % (base_url, job_name),
+            },
+            {
+                '_class': "org.jenkinsci.plugins.workflow.job.WorkflowRun",
+                'number': 20,
+                'url': "%s/job/%s" % (base_url, job_name),
+            },
+            {
+                '_class': "org.jenkinsci.plugins.workflow.job.WorkflowRun",
+                'number': 21,
+                'url': "%s/job/%s" % (base_url, job_name),
+            },
+        ],
+    }
