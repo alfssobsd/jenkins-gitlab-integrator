@@ -17,6 +17,13 @@
             <label>jobs_base_path</label>
             <input [(ngModel)]="jenkinsGroup.jobs_base_path" [ngModelOptions]="{standalone: true}" class="form-control" placeholder="http://jenkins.server/job/folder">
           </div>
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                  <input [(ngModel)]="jenkinsGroup.is_pipeline" [ngModelOptions]="{standalone: true}" type="checkbox"/> pipeline job
+              </label>
+            </div>
+          </div>
           <button (click)="save()" class="btn btn-default">Save</button>
         </form>
       </div>

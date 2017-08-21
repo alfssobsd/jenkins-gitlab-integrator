@@ -11,6 +11,7 @@ class JenkinsGroup(object):
         self.id = None
         self.name = None
         self.jobs_base_path = None
+        self.is_pipeline = True
 
     @property
     def values(self):
@@ -18,10 +19,11 @@ class JenkinsGroup(object):
         return result
 
     @staticmethod
-    def make(name, jobs_base_path):
+    def make(name, jobs_base_path, is_pipeline):
         obj = JenkinsGroup()
         obj.name = name
         obj.jobs_base_path = jobs_base_path
+        obj.is_pipeline = is_pipeline
         return obj
 
     def __repr__(self):

@@ -23,6 +23,15 @@
             </div>
           </div>
           <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <div class="checkbox">
+                <label>
+                    <input [(ngModel)]="newJenkinsGroup.is_pipeline" [ngModelOptions]="{standalone: true}" type="checkbox"/> pipeline job
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
             <div class="col-md-offset-2 col-md-4">
               <button (click)="createGroup()" class="btn btn-primary">createGroup</button>
             </div>
@@ -57,6 +66,7 @@
                 <th>#</th>
                 <th>name</th>
                 <th>jobs_base_path</th>
+                <th>is_pipeline</th>
                 <th>actions</th>
               </tr>
             </thead>
@@ -65,6 +75,7 @@
                 <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.id}} </a></td>
                 <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.name}} </a></td>
                 <td>{{group.jobs_base_path}}</td>
+                <td>{{group.is_pipeline}}</td>
                 <td>
                   <a [routerLink]="['/jenkins-groups', group.id]"> Edit </a>
                   <a (click)="deleteGroup(group)" href="javascript:void(0)" > Delete </a>
