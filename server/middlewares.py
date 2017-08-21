@@ -1,5 +1,4 @@
 import uuid
-import json
 import logging
 
 from aiohttp import web
