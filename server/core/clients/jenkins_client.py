@@ -113,6 +113,34 @@ class JenkinsClient(LoggingMixin):
 
         return self._parse_build_info(response_data, repo_remote_url)
 
+    async def get_build_numbers(self, job_base_path, job_name, branch, is_pipeline=True):
+        """
+        Get build numbers from job
+
+        Args:
+            job_base_path - base folder for mutibranch pipline job
+            job_name - multibranch pipline job
+            branch - name branch in pipline job
+            is_pipeline  - pipeline or not (True or Fa
+
+        Return:
+            Array [number_ids] -> [10, 9, 8, 7]
+
+        Exceptions:
+            aiohttp.client_exceptions.ClientResponseError - job not exist
+            aiohttp.client_exceptions.ClientConnectorError - problem connect
+            KeyError - job not exist
+        """
+
+        job_url = self._job_url(_JOB_INFO,
+                                **{'job_full_path': self._job_full_path(job_base_path, job_name, branch, is_pipeline)})
+        self._logging_info("url=%s" % job_url)
+
+        response_data, response_status = await self._get_request_json(job_url)
+        self._logging_info("status = %d" % response_status)
+
+        return list(map(lambda x: x['number'], response_data['builds']))
+
     async def get_last_success_build(self, job_base_path, job_name, branch, repo_remote_url, is_pipeline=True):
         """
         Get info about last succes build
