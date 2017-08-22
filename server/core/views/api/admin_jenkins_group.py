@@ -61,7 +61,7 @@ class AdminApiV1JenkinsGroupView(web.View, LoggingMixin, WebHookApiMixin):
         obj = JenkinsGroup()
         obj.name = json_data['name']
         obj.jobs_base_path = json_data['jobs_base_path']
-        obj.is_pipeline = json_data['is_pipeline']
+        obj.is_multibranch = json_data['is_multibranch']
         group = await self.jenkins_group_manager.create(obj)
 
         return web.json_response(group, dumps=partial(json.dumps, cls=CustomJSONEncoder))
@@ -76,7 +76,7 @@ class AdminApiV1JenkinsGroupView(web.View, LoggingMixin, WebHookApiMixin):
         obj.id = self.request.match_info['id']
         obj.name = json_data['name']
         obj.jobs_base_path = json_data['jobs_base_path']
-        obj.is_pipeline = json_data['is_pipeline']
+        obj.is_multibranch = json_data['is_multibranch']
 
         await self.jenkins_group_manager.update(obj)
 

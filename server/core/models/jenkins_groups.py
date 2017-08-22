@@ -11,7 +11,7 @@ class JenkinsGroup(object):
         self.id = None
         self.name = None
         self.jobs_base_path = None
-        self.is_pipeline = True
+        self.is_multibranch = True
 
     @property
     def values(self):
@@ -19,11 +19,11 @@ class JenkinsGroup(object):
         return result
 
     @staticmethod
-    def make(name, jobs_base_path, is_pipeline):
+    def make(name, jobs_base_path, is_multibranch):
         obj = JenkinsGroup()
         obj.name = name
         obj.jobs_base_path = jobs_base_path
-        obj.is_pipeline = is_pipeline
+        obj.is_multibranch = is_multibranch
         return obj
 
     def __repr__(self):

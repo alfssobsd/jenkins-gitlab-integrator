@@ -110,12 +110,6 @@ class GitLabMergeService(LoggingMixin):
         """
         Check build
 
-        successful(if all option is true):
-            - all job exist
-            - all last success build is correct flow (job1 -> job2 -> jobN)
-            - all job have status SUCCESS
-            - sha1 from delayed_task eq sha1 from last success build info
-
         Args:
             delayed_task - DelayedTask obj
 
@@ -125,54 +119,100 @@ class GitLabMergeService(LoggingMixin):
         """
         self._logging_info("check build %s" % delayed_task)
         ssh_url_to_repo = await self._gitlab_client.get_ssh_url_to_repo(delayed_task.gitlab_project_id)
+        jenkins_group = await self._jenkins_group_manager.find_by_name(delayed_task.group)
         prev_build_info = None
-        # check build flow
+
         try:
-            jenkins_group = await self._jenkins_group_manager.find_by_name(delayed_task.group)
-            jenkins_jobs = await self._jenkins_job_manager.find_by_group_id(jenkins_group.id)
-            job_path_finder = JenkinsJobPathFinder(jenkins_jobs)
-
-            paths = job_path_finder.get_all_paths()
-            self._logging_debug(paths)
-
-            for path in paths:
-                for job in path:
-                    repo_remote_url = None
-
-                    # if set repo job_name eq current job var, set repo_remote_url
-                    # for search build sha1
-                    if delayed_task.job_name == job.name:
-                        repo_remote_url = ssh_url_to_repo
-
-                    # get info about last succes build
-                    build_info = await self._jenkins_client.get_last_success_build(
-                        jenkins_group.jobs_base_path,
-                        job.name,
-                        delayed_task.branch,
-                        repo_remote_url)
-                    self._logging_debug(build_info)
-
-                    # failure build if sha1 from mege does not match
-                    if delayed_task.job_name == job.name:
-                        if not build_info.sha1 == delayed_task.sha1:
-                            return False
-
-                    # failure build if not correct flow
-                    if prev_build_info is not None:
-                        if not build_info.upsteram_build_number == prev_build_info.number:
-                            return False
-
-                    # failure build if result not SUCCESS
-                    if not build_info.result == "SUCCESS":
-                        return False
-
-                    prev_build_info = build_info
-        except ClientResponseError as e:
-            self._logging_debug(e)
-            return False
-        except ClientConnectorError as e:
+            if jenkins_group.is_multibranch:
+                return await self._check_multibranch_jobs(jenkins_group delayed_task, ssh_url_to_repo)
+            else
+                return await self._check_single_job(jenkins_group delayed_task, ssh_url_to_repo)
+        except (ClientResponseError, ClientConnectorError) as e:
             self._logging_error(e)
             return False
+
+    async def _check_single_job(jenkins_group, delayed_task, ssh_url_to_repo):
+        """
+        Check single job
+
+        successful(if all option is true):
+            - job exist
+            - if at least one build from the last 100 have status 'SUCCESS' and correct sha1
+
+        Args:
+            jenkins_group - JenkinsGroup obj
+            delayed_task - DelayedTask obj
+            ssh_url_to_repo - path to git repo from merge
+
+        Return:
+            True - successful build
+            False - failure buid
+        """
+        first_job = await self._jenkins_job_manager.find_first_by_group_id(jenkins_group.id)
+        build_numbers = await jenkins_client.get_build_numbers(jenkins_group.jobs_base_path, first_job.name,
+                                                                delayed_task.branch, is_multibranch=False)
+
+        # check only last 100 builds
+        for number in build_numbers[:100]:
+            # get build info by number
+            build_info = await self._jenkins_client.get_build_info(jenkins_group.jobs_base_path, first_job.name,
+                                                                    delayed_task.branch, ssh_url_to_repo, number, is_multibranch=False)
+            self._logging_debug(build_info)
+
+            # search first build where correct sha1 and status = 'SUCCESS'
+            if build_info.sha1 == delayed_task.sha1 and build_info.result == 'SUCCESS':
+                return True
+
+        return False
+
+    async def _check_multibranch_jobs(jenkins_group, delayed_task, ssh_url_to_repo):
+        """
+        Check mubltibranch jobs
+
+        successful(if all option is true):
+            - all job exist
+            - all last success build is correct flow (job1 -> job2 -> jobN)
+            - all job have status SUCCESS
+            - sha1 from delayed_task eq sha1 from last success build info
+
+        Args:
+            jenkins_group - JenkinsGroup obj
+            delayed_task - DelayedTask obj
+            ssh_url_to_repo - path to git repo from merge
+
+        Return:
+            True - successful build
+            False - failure buid
+        """
+        jenkins_jobs = await self._jenkins_job_manager.find_by_group_id(jenkins_group.id)
+        job_path_finder = JenkinsJobPathFinder(jenkins_jobs)
+        prev_build_info = None
+
+        paths = job_path_finder.get_all_paths()
+        self._logging_debug(paths)
+        for path in paths:
+            for job in path:
+                repo_remote_url = None
+
+                # if job_name in merge req eq current job_name, set repo_remote_url for search sha1
+                if delayed_task.job_name == job.name:
+                    repo_remote_url = ssh_url_to_repo
+
+                # get info about last succes build
+                build_info = await self._jenkins_client.get_last_success_build(jenkins_group.jobs_base_path, job.name,
+                                                                                delayed_task.branch, repo_remote_url)
+                self._logging_debug(build_info)
+
+                # failure build if sha1 from mege does not match or result not SUCCESS
+                if delayed_task.job_name == job.name and build_info.result != 'SUCCESS':
+                    return False
+
+                # failure build if not correct flow
+                if prev_build_info is not None:
+                    if not build_info.upsteram_build_number == prev_build_info.number:
+                        return False
+
+                prev_build_info = build_info
 
         return True
 

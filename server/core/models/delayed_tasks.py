@@ -12,7 +12,6 @@ class DelayedTaskStatus(enum.Enum):
     SUCCESS = 2
     CANCELED = 3
 
-
 class DelayedTaskType(enum.Enum):
     GITLAB_MERGE_REQ = 1
     GITLAB_PUSH = 2

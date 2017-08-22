@@ -21,7 +21,7 @@ export class JenkinsGroupsComponent implements OnInit {
     private router: Router,
   ) {
     this.newJenkinsGroup = new JenkinsGroup();
-    this.newJenkinsGroup.is_pipeline = true;
+    this.newJenkinsGroup.is_multibranch = true;
   }
 
   ngOnInit() {

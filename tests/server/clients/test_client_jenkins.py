@@ -73,21 +73,21 @@ async def test_jenkins_single_job_builds_numbers(loop, fixture_fake_jenkins_serv
     job_base_path = "http://%s:%d" % (server, port)
     job_name = "job_second"
     branch = "feature_4"
-    build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_pipeline=False)
+    build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_multibranch=False)
     assert build_numbers == [19, 20, 21]
 
     job_name = "job_first"
-    build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_pipeline=False)
+    build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_multibranch=False)
     assert build_numbers == [19, 20, 21]
 
     with pytest.raises(aiohttp.client_exceptions.ClientResponseError) as e_info:
         job_name = "not_exist"
-        build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_pipeline=False)
+        build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_multibranch=False)
 
 async def test_jenkins_pipline_job_builds_numbers(loop, fixture_fake_jenkins_server, jenkins_client):
     server, port = await fixture_fake_jenkins_server
     job_base_path = "http://%s:%d/job/experements" % (server, port)
     job_name = "job_second"
     branch = "feature_4"
-    build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_pipeline=True)
+    build_numbers = await jenkins_client.get_build_numbers(job_base_path, job_name, branch, is_multibranch=True)
     assert build_numbers == [19, 20, 21]

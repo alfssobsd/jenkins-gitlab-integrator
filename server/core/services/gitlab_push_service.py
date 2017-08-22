@@ -93,7 +93,7 @@ class GitLabPushService(LoggingMixin):
             jenkins_group = await self._jenkins_group_manager.find_by_name(group_name)
             jenkins_jobs = await self._jenkins_job_manager.find_by_group_id(jenkins_group.id)
             for job in jenkins_jobs:
-                await self._jenkins_client.job_exists(jenkins_group.jobs_base_path, job.name, branch, jenkins_group.is_pipeline)
+                await self._jenkins_client.job_exists(jenkins_group.jobs_base_path, job.name, branch, jenkins_group.is_multibranch)
 
         except (ClientResponseError) as e:
             self._logging_debug(e)
@@ -113,7 +113,7 @@ class GitLabPushService(LoggingMixin):
         jenkins_group = await self._jenkins_group_manager.find_by_name(delayed_task.group)
         first_job = await self._jenkins_job_manager.find_first_by_group_id(jenkins_group.id)
 
-        await self._jenkins_client.build(jenkins_group.jobs_base_path, first_job.name, delayed_task.branch, jenkins_group.is_pipeline)
+        await self._jenkins_client.build(jenkins_group.jobs_base_path, first_job.name, delayed_task.branch, jenkins_group.is_multibranch)
 
         try:
             n_delayed_task = await self._delayed_task_manager.get_by_uniq_md5sum(delayed_task.uniq_md5sum)

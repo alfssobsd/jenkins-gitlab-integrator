@@ -18,8 +18,8 @@ depends_on = None
 
 def upgrade():
     op.add_column( 'jenkins_groups',
-        sa.Column('is_pipeline', sa.Boolean(), nullable=False, server_default=sa.schema.DefaultClause("1")),
+        sa.Column('is_multibranch', sa.Boolean(), nullable=False, server_default=sa.schema.DefaultClause("1")),
     )
 
 def downgrade():
-    op.drop_column('jenkins_groups', 'is_pipeline')
+    op.drop_column('jenkins_groups', 'is_multibranch')
