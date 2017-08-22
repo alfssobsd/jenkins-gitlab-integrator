@@ -104,7 +104,7 @@ class JenkinsClient(LoggingMixin):
 
         job_url = self._job_url(_BUILD_INFO,
                                 **{'job_full_path': self._job_full_path(job_base_path, job_name, branch, is_multibranch),
-                                    'build_number': build_number})
+                                    'number': build_number})
 
         self._logging_info("url=%s" % job_url)
 

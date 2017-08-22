@@ -66,7 +66,7 @@
                 <th>#</th>
                 <th>name</th>
                 <th>jobs_base_path</th>
-                <th>is_pipeline</th>
+                <th>is_multibranch</th>
                 <th>actions</th>
               </tr>
             </thead>
@@ -75,7 +75,7 @@
                 <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.id}} </a></td>
                 <td><a [routerLink]="['/jenkins-groups', group.id]"> {{group.name}} </a></td>
                 <td>{{group.jobs_base_path}}</td>
-                <td>{{group.is_pipeline}}</td>
+                <td>{{group.is_multibranch}}</td>
                 <td>
                   <a [routerLink]="['/jenkins-groups', group.id]"> Edit </a>
                   <a (click)="deleteGroup(group)" href="javascript:void(0)" > Delete </a>

@@ -124,14 +124,14 @@ class GitLabMergeService(LoggingMixin):
 
         try:
             if jenkins_group.is_multibranch:
-                return await self._check_multibranch_jobs(jenkins_group delayed_task, ssh_url_to_repo)
-            else
-                return await self._check_single_job(jenkins_group delayed_task, ssh_url_to_repo)
+                return await self._check_multibranch_jobs(jenkins_group, delayed_task, ssh_url_to_repo)
+            else:
+                return await self._check_single_job(jenkins_group, delayed_task, ssh_url_to_repo)
         except (ClientResponseError, ClientConnectorError) as e:
             self._logging_error(e)
             return False
 
-    async def _check_single_job(jenkins_group, delayed_task, ssh_url_to_repo):
+    async def _check_single_job(self, jenkins_group, delayed_task, ssh_url_to_repo):
         """
         Check single job
 
@@ -149,7 +149,7 @@ class GitLabMergeService(LoggingMixin):
             False - failure buid
         """
         first_job = await self._jenkins_job_manager.find_first_by_group_id(jenkins_group.id)
-        build_numbers = await jenkins_client.get_build_numbers(jenkins_group.jobs_base_path, first_job.name,
+        build_numbers = await self._jenkins_client.get_build_numbers(jenkins_group.jobs_base_path, first_job.name,
                                                                 delayed_task.branch, is_multibranch=False)
 
         # check only last 100 builds
@@ -165,7 +165,7 @@ class GitLabMergeService(LoggingMixin):
 
         return False
 
-    async def _check_multibranch_jobs(jenkins_group, delayed_task, ssh_url_to_repo):
+    async def _check_multibranch_jobs(self, jenkins_group, delayed_task, ssh_url_to_repo):
         """
         Check mubltibranch jobs
 
