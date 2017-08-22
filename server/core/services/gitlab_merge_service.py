@@ -163,6 +163,11 @@ class GitLabMergeService(LoggingMixin):
             if build_info.sha1 == delayed_task.sha1 and build_info.result == 'SUCCESS':
                 return True
 
+            # stop sacn if we found sha1
+            if build_info.sha1 == delayed_task.sha1 and build_info.result != 'SUCCESS':
+                self._logging_error("wrong result %s" % build_info.result)
+                return False
+
         return False
 
     async def _check_multibranch_jobs(self, jenkins_group, delayed_task, ssh_url_to_repo):
@@ -203,14 +208,23 @@ class GitLabMergeService(LoggingMixin):
                                                                                 delayed_task.branch, repo_remote_url)
                 self._logging_debug(build_info)
 
-                # failure build if sha1 from mege does not match or result not SUCCESS
-                if delayed_task.job_name == job.name and build_info.result != 'SUCCESS':
-                    return False
+                # failure build if sha1 from mege does not match
+                if delayed_task.job_name == job.name:
+                    if not build_info.sha1 == delayed_task.sha1:
+                        self._logging_error("wrong sha1 -> required: %s, current %s" % (delayed_task.sha1, build_info.sha1))
+                        return False
 
-                # failure build if not correct flow
+                # failure build if incorrect flow
                 if prev_build_info is not None:
                     if not build_info.upsteram_build_number == prev_build_info.number:
+                        self._logging_error("incorrect flow -> current upstream build number=%s, required build number=%s"
+                            % ( str(build_info.upsteram_build_number), str(prev_build_info.number)))
                         return False
+
+                # failure build if result not SUCCESS
+                if not build_info.result == "SUCCESS":
+                    self._logging_error("wrong result %s" % build_info.result)
+                    return False
 
                 prev_build_info = build_info
 
